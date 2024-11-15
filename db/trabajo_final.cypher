@@ -1,106 +1,143 @@
-// Restricciones
-CREATE CONSTRAINT deporte_unico IF NOT EXISTS
-FOR (d:Deporte) REQUIRE d.nombre IS UNIQUE;
+// Limpiar la base de datos
+MATCH (n) DETACH DELETE n;
 
-CREATE CONSTRAINT equipo_unico IF NOT EXISTS
-FOR (e:Equipo) REQUIRE (e.nombre, e.pais) IS UNIQUE;
+// Crear Países
+CREATE (:Pais {nombre: "España"});
+CREATE (:Pais {nombre: "Alemania"});
+CREATE (:Pais {nombre: "Venezuela"});
+CREATE (:Pais {nombre: "Polonia"});
+CREATE (:Pais {nombre: "Uruguay"});
+CREATE (:Pais {nombre: "Países Bajos"});
+CREATE (:Pais {nombre: "Chile"});
+CREATE (:Pais {nombre: "Estados Unidos"});
+CREATE (:Pais {nombre: "Brasil"});
+CREATE (:Pais {nombre: "Argentina"});
 
-CREATE CONSTRAINT deportista_unico IF NOT EXISTS
-FOR (d:Deportista) REQUIRE (d.nombre, d.dorsal, d.pais) IS UNIQUE;
+// Crear Ciudades y relacionarlas con Países
 
-// Países
-CREATE (p1:Pais {nombre: "España"});
-CREATE (p2:Pais {nombre: "Alemania"});
-CREATE (p3:Pais {nombre: "Venezuela"});
-CREATE (p4:Pais {nombre: "Inglaterra"});
+// Ciudades de Alemania
+MATCH (paisAlemania:Pais {nombre: "Alemania"})
+CREATE (c1:Ciudad {nombre: "Mönchengladbach"})-[:PERTENECE_A]->(paisAlemania),
+       (c9:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(paisAlemania),
+       (c10:Ciudad {nombre: "Rottweil"})-[:PERTENECE_A]->(paisAlemania);
 
-// Deportes
-CREATE (d1:Deporte {nombre: "Fútbol"});
-CREATE (d2:Deporte {nombre: "Beisbol"});
+// Ciudades de Uruguay
+MATCH (paisUruguay:Pais {nombre: "Uruguay"})
+CREATE (c2:Ciudad {nombre: "Rivera"})-[:PERTENECE_A]->(paisUruguay);
 
-// Ciudades
-CREATE (c1:Ciudad {nombre: "Tegueste"})-[:PERTENECE_A]->(p1);
-CREATE (c2:Ciudad {nombre: "Londres"})-[:PERTENECE_A]->(p4);
-CREATE (c3:Ciudad {nombre: "Caracas"})-[:PERTENECE_A]->(p3);
+// Ciudades de Países Bajos
+MATCH (paisPaisesBajos:Pais {nombre: "Países Bajos"})
+CREATE (c3:Ciudad {nombre: "Arkel"})-[:PERTENECE_A]->(paisPaisesBajos);
 
-// Equipos de Fútbol
-MATCH (d:Deporte {nombre: "Fútbol"}), (p:Pais {nombre: "España"})
-CREATE (e1:Equipo {nombre: "Barcelona", pais: "España"})
-CREATE (e1)-[:PRACTICA_DEPORTE]->(d)
-CREATE (e1)-[:UBICADO_EN]->(p);
+// Ciudades de España
+MATCH (paisEspaña:Pais {nombre: "España"})
+CREATE (c4:Ciudad {nombre: "Los Palacios y Villafranca"})-[:PERTENECE_A]->(paisEspaña),
+       (c7_es:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(paisEspaña);
 
-MATCH (d:Deporte {nombre: "Fútbol"}), (p:Pais {nombre: "Alemania"})
-CREATE (e2:Equipo {nombre: "Bayern Munich", pais: "Alemania"})
-CREATE (e2)-[:PRACTICA_DEPORTE]->(d)
-CREATE (e2)-[:UBICADO_EN]->(p);
+// Ciudades de Polonia
+MATCH (paisPolonia:Pais {nombre: "Polonia"})
+CREATE (c5:Ciudad {nombre: "Varsovia"})-[:PERTENECE_A]->(paisPolonia);
 
-// Equipo de Béisbol
-MATCH (d:Deporte {nombre: "Beisbol"}), (p:Pais {nombre: "Venezuela"})
-CREATE (e3:Equipo {nombre: "Caribes de Anzoátegui", pais: "Venezuela"})
-CREATE (e3)-[:PRACTICA_DEPORTE]->(d)
-CREATE (e3)-[:UBICADO_EN]->(p);
+// Ciudades de Venezuela
+MATCH (paisVenezuela:Pais {nombre: "Venezuela"})
+CREATE (c6:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(paisVenezuela),
+       (c7_ve:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(paisVenezuela),
+       (c8:Ciudad {nombre: "Maracay"})-[:PERTENECE_A]->(paisVenezuela);
 
-// Deportistas
-// Pedri
-MATCH (c:Ciudad {nombre: "Tegueste"}), (e:Equipo {nombre: "Barcelona"})
+// Crear Deportes
+CREATE (:Deporte {nombre: "Fútbol"});
+CREATE (:Deporte {nombre: "Béisbol"});
+
+// Crear Equipos
+CREATE (:Equipo {nombre: "Barcelona"});
+CREATE (:Equipo {nombre: "Bayern Munich"});
+CREATE (:Equipo {nombre: "Caribes de Anzoátegui"});
+
+// Relacionar equipos con deportes y países
+
+// Barcelona
+MATCH (eBarcelona:Equipo {nombre: "Barcelona"}),
+      (dFutbol:Deporte {nombre: "Fútbol"}),
+      (paisEspaña:Pais {nombre: "España"})
+CREATE (eBarcelona)-[:PRACTICA]->(dFutbol),
+       (eBarcelona)-[:ES_DE]->(paisEspaña);
+
+// Bayern Munich
+MATCH (eBM:Equipo {nombre: "Bayern Munich"}),
+      (dFutbol:Deporte {nombre: "Fútbol"}),
+      (paisAlemania:Pais {nombre: "Alemania"})
+CREATE (eBM)-[:PRACTICA]->(dFutbol),
+       (eBM)-[:ES_DE]->(paisAlemania);
+
+// Caribes de Anzoátegui
+MATCH (eCA:Equipo {nombre: "Caribes de Anzoátegui"}),
+      (dBeisbol:Deporte {nombre: "Béisbol"}),
+      (paisVenezuela:Pais {nombre: "Venezuela"})
+CREATE (eCA)-[:PRACTICA]->(dBeisbol),
+       (eCA)-[:ES_DE]->(paisVenezuela);
+
+// Jugadores del FC Barcelona
+
+// Marc-André ter Stegen
+MATCH (c:Ciudad {nombre: "Mönchengladbach"})-[:PERTENECE_A]->(pais:Pais {nombre: "Alemania"}),
+      (eBarcelona:Equipo {nombre: "Barcelona"})
 CREATE (d:Deportista {
-    nombre: "Pedri",
-    pais: "España",
-    posicion: "Centrocampista",
-    dorsal: 8,
+    nombre: "Marc-André ter Stegen",
+    posicion: "Portero",
+    dorsal: 1,
     sexo: "Masculino"
 })
-CREATE (d)-[:NACE_EN {fecha_nacimiento: date("2002-11-25")}]->(c)
-CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2019-09-02")}]->(e);
+CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1992-04-30")}]->(c)
+CREATE (d)-[:ES_DE]->(pais)
+CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2014-05-22")}]->(eBarcelona)
+CREATE (contrato:Contrato {
+    fecha_inicio: date("2014-05-22"),
+    fecha_fin: date("2025-06-30"),
+    valor_contrato: 75000000
+})
+CREATE (d)-[:TIENE_CONTRATO]->(contrato)
+CREATE (contrato)-[:CONTRATO_CON]->(eBarcelona);
 
-// Harry Kane
-MATCH (c:Ciudad {nombre: "Londres"}), (e:Equipo {nombre: "Bayern Munich"})
+// Jugadores del Bayern Munich
+
+// Manuel Neuer
+MATCH (c:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(pais:Pais {nombre: "Alemania"}),
+      (eBM:Equipo {nombre: "Bayern Munich"})
 CREATE (d:Deportista {
-    nombre: "Harry Kane",
-    pais: "Inglaterra",
-    posicion: "Delantero",
+    nombre: "Manuel Neuer",
+    posicion: "Portero",
+    dorsal: 1,
+    sexo: "Masculino"
+})
+CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1986-03-27")}]->(c)
+CREATE (d)-[:ES_DE]->(pais)
+CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2011-06-01")}]->(eBM)
+CREATE (contrato:Contrato {
+    fecha_inicio: date("2011-06-01"),
+    fecha_fin: date("2024-06-30"),
+    valor_contrato: 18000000
+})
+CREATE (d)-[:TIENE_CONTRATO]->(contrato)
+CREATE (contrato)-[:CONTRATO_CON]->(eBM);
+
+// Jugadores de Caribes de Anzoátegui
+
+// Oswaldo Arcia
+MATCH (c:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(pais:Pais {nombre: "Venezuela"}),
+      (eCA:Equipo {nombre: "Caribes de Anzoátegui"})
+CREATE (d:Deportista {
+    nombre: "Oswaldo Arcia",
+    posicion: "Jardinero",
     dorsal: 9,
     sexo: "Masculino"
 })
-CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1993-07-28")}]->(c)
-CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2023-08-12")}]->(e);
-
-// José Altuve
-MATCH (c:Ciudad {nombre: "Caracas"}), (e:Equipo {nombre: "Caribes de Anzoátegui"})
-CREATE (d:Deportista {
-    nombre: "José Altuve",
-    pais: "Venezuela",
-    posicion: "Segunda Base",
-    dorsal: 27,
-    sexo: "Masculino"
+CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1991-05-09")}]->(c)
+CREATE (d)-[:ES_DE]->(pais)
+CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2010-10-12")}]->(eCA)
+CREATE (contrato:Contrato {
+    fecha_inicio: date("2010-10-12"),
+    fecha_fin: date("2024-12-31"),
+    valor_contrato: 1500000
 })
-CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1990-05-06")}]->(c)
-CREATE (d)-[:JUEGA_EN {fecha_vinculacion: date("2011-07-20")}]->(e);
-
-// Contratos
-// Contrato de Pedri
-MATCH (d:Deportista {nombre: "Pedri"}), (e:Equipo {nombre: "Barcelona"})
-CREATE (d)-[:TIENE_CONTRATO]->(c:Contrato {
-    fecha_inicio: date("2019-09-02"),
-    fecha_fin: date("2026-06-30"),
-    valor_contrato: 80000000
-})
-CREATE (c)-[:CONTRATO_CON]->(e);
-
-// Contrato de Harry Kane
-MATCH (d:Deportista {nombre: "Harry Kane"}), (e:Equipo {nombre: "Bayern Munich"})
-CREATE (d)-[:TIENE_CONTRATO]->(c:Contrato {
-    fecha_inicio: date("2023-08-12"),
-    fecha_fin: date("2027-06-30"),
-    valor_contrato: 100000000
-})
-CREATE (c)-[:CONTRATO_CON]->(e);
-
-// Contrato de José Altuve
-MATCH (d:Deportista {nombre: "José Altuve"}), (e:Equipo {nombre: "Caribes de Anzoátegui"})
-CREATE (d)-[:TIENE_CONTRATO]->(c:Contrato {
-    fecha_inicio: date("2011-07-20"),
-    fecha_fin: date("2025-12-31"),
-    valor_contrato: 29000000
-})
-CREATE (c)-[:CONTRATO_CON]->(e);
+CREATE (d)-[:TIENE_CONTRATO]->(contrato)
+CREATE (contrato)-[:CONTRATO_CON]->(eCA);
