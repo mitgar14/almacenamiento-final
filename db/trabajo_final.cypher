@@ -5,44 +5,17 @@ MATCH (n) DETACH DELETE n;
 CREATE (:Pais {nombre: "España"});
 CREATE (:Pais {nombre: "Alemania"});
 CREATE (:Pais {nombre: "Venezuela"});
-CREATE (:Pais {nombre: "Polonia"});
-CREATE (:Pais {nombre: "Uruguay"});
-CREATE (:Pais {nombre: "Países Bajos"});
-CREATE (:Pais {nombre: "Chile"});
-CREATE (:Pais {nombre: "Estados Unidos"});
-CREATE (:Pais {nombre: "Brasil"});
-CREATE (:Pais {nombre: "Argentina"});
 
 // Crear Ciudades y relacionarlas con Países
 
 // Ciudades de Alemania
 MATCH (paisAlemania:Pais {nombre: "Alemania"})
 CREATE (c1:Ciudad {nombre: "Mönchengladbach"})-[:PERTENECE_A]->(paisAlemania),
-       (c9:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(paisAlemania),
-       (c10:Ciudad {nombre: "Rottweil"})-[:PERTENECE_A]->(paisAlemania);
-
-// Ciudades de Uruguay
-MATCH (paisUruguay:Pais {nombre: "Uruguay"})
-CREATE (c2:Ciudad {nombre: "Rivera"})-[:PERTENECE_A]->(paisUruguay);
-
-// Ciudades de Países Bajos
-MATCH (paisPaisesBajos:Pais {nombre: "Países Bajos"})
-CREATE (c3:Ciudad {nombre: "Arkel"})-[:PERTENECE_A]->(paisPaisesBajos);
-
-// Ciudades de España
-MATCH (paisEspaña:Pais {nombre: "España"})
-CREATE (c4:Ciudad {nombre: "Los Palacios y Villafranca"})-[:PERTENECE_A]->(paisEspaña),
-       (c7_es:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(paisEspaña);
-
-// Ciudades de Polonia
-MATCH (paisPolonia:Pais {nombre: "Polonia"})
-CREATE (c5:Ciudad {nombre: "Varsovia"})-[:PERTENECE_A]->(paisPolonia);
+       (c9:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(paisAlemania);
 
 // Ciudades de Venezuela
 MATCH (paisVenezuela:Pais {nombre: "Venezuela"})
-CREATE (c6:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(paisVenezuela),
-       (c7_ve:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(paisVenezuela),
-       (c8:Ciudad {nombre: "Maracay"})-[:PERTENECE_A]->(paisVenezuela);
+CREATE (c6:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(paisVenezuela);
 
 // Crear Deportes
 CREATE (:Deporte {nombre: "Fútbol"});
