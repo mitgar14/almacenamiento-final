@@ -1,10 +1,6 @@
-const { equipoSchema } = require('../validations/equipo');
 const Equipo = require('../models/equipo');
 
 const crearEquipo = async (req, res) => {
-    const { error } = equipoSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
-
     try {
         const equipo = await Equipo.create(req.body);
         res.status(201).json(equipo);
@@ -44,9 +40,6 @@ const obtenerEquiposPorDeporte = async (req, res) => {
 
 const actualizarEquipo = async (req, res) => {
     const { id } = req.params;
-    const { error } = equipoSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
-
     try {
         const equipoActualizado = await Equipo.update(id, req.body);
         if (!equipoActualizado) return res.status(404).json({ error: 'Equipo no encontrado' });
