@@ -1,11 +1,14 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { validarCampos } = require('../middlewares');
+const { validarCampos,
+    existeDeportistaPorId,
+    noExistenContratacionesPorDeportista } = require('../middlewares');
 
 const {
     crearDeportista,
     obtenerDeportistas,
     obtenerDeportistaPorNombre,
+    obtenerDeportistaPorID,
     actualizarDeportista,
     eliminarDeportista
 } = require('../controllers/deportistas');
@@ -32,16 +35,20 @@ router.post('/', [
 
 // Actualizar un deportista
 router.put('/', [
+    check('id', 'El ID es obligatorio').not().isEmpty(),
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('dorsal', 'El dorsal debe ser un número entero').optional().isInt(),
     check('posicion', 'La posición es obligatoria').optional().not().isEmpty(),
     check('sexo', 'El sexo debe ser Masculino, Femenino o Otro').optional().isIn(['Masculino', 'Femenino', 'Otro']),
+    check('id').custom(existeDeportistaPorId),
     validarCampos
 ], actualizarDeportista);
 
 // Eliminar un deportista
 router.delete('/', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    check('id').custom(existeDeportistaPorId),
+    check('id').custom(noExistenContratacionesPorDeportista),
     validarCampos
 ], eliminarDeportista);
 
