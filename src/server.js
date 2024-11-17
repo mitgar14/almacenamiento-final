@@ -13,9 +13,9 @@ class Server {
             deportistas: '/api/deportistas',
             contrataciones: '/api/contrataciones',
             consultas: '/api/consultas',
-            pais: '/api/paises',  
-            deporte: '/api/deportes',
-            ciudad: '/api/ciudades'
+            // pais: '/api/paises',  
+            // deporte: '/api/deportes',
+            // ciudad: '/api/ciudades'
         };
 
        
@@ -42,9 +42,9 @@ class Server {
         this.app.use(this.pathsNeo4j.deportistas, require('./routes/deportistas'));
         this.app.use(this.pathsNeo4j.contrataciones, require('./routes/contrataciones'));
         this.app.use(this.pathsNeo4j.consultas, require('./routes/consultas')); 
-        this.app.use(this.pathsNeo4j.pais, require('./routes/pais')); 
-        this.app.use(this.pathsNeo4j.deporte, require('./routes/deporte')); 
-        this.app.use(this.pathsNeo4j.ciudad, require('./routes/ciudades')); 
+        // this.app.use(this.pathsNeo4j.pais, require('./routes/pais')); 
+        // this.app.use(this.pathsNeo4j.deporte, require('./routes/deporte')); 
+        // this.app.use(this.pathsNeo4j.ciudad, require('./routes/ciudades')); 
     }
 
     listen() {

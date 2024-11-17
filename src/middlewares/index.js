@@ -1,7 +1,7 @@
 const validarCampos = require('./validar-campos');
-const validarEquipo = require('./validarEquipo');
-const validarDeportista = require('./validarDeportista');
-const validarContratacion = require('./validarContratacion');
+const validarEquipo = require('./validar-Equipo');
+const validarDeportista = require('./validar-Deportista');
+const validarContratacion = require('./validar-Contratacion');
 
 module.exports = {
     ...validarCampos,
