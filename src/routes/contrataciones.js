@@ -7,7 +7,7 @@ const {
     actualizarContratacion,
     eliminarContratacion
 } = require('../controllers/contrataciones');
-const { validarCampos } = require('../middlewares/validar-campos');
+const { validarCampos } = require('../middlewares');
 
 const router = Router();
 
