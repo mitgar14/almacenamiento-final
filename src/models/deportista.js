@@ -1,6 +1,6 @@
 const neo4j = require("neo4j-driver");
 const { driver } = require("../database/Neo4jConnection");
-const { Relaciones } = require("../services/relaciones");
+const { RelacionesDeportistas } = require("../services/relaciones");
 
 class Deportista {
   static async getAll() {
@@ -13,7 +13,7 @@ class Deportista {
           const props = record.get("d").properties;
           const deportistaId = record.get("d").identity;
 
-          const relaciones = await Relaciones.getCiudadYContratos(deportistaId);
+          const relaciones = await RelacionesDeportistas.getCiudadYContratosParaDeportistas(deportistaId);
 
           return {
             ...props,
