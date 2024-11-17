@@ -23,6 +23,19 @@ const obtenerDeportistaPorNombre = async (req, res) => {
     }
 };
 
+const obtenerDeportistaPorID = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deportista = await Deportista.getByID(id);
+        if (!deportista) {
+            return res.status(404).json({ error: 'Deportista no encontrado' });
+        }
+        res.status(200).json(deportista);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener el deportista' });
+    }
+};
+
 const crearDeportista = async (req, res) => {
     const { error } = deportistaSchema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
@@ -64,6 +77,7 @@ module.exports = {
     crearDeportista,
     obtenerDeportistas,
     obtenerDeportistaPorNombre,
+    obtenerDeportistaPorID,
     actualizarDeportista,
     eliminarDeportista
 };

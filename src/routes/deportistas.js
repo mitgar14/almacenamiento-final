@@ -1,14 +1,15 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { validarCampos,
-    existeDeportistaPorId,
-    noExistenContratacionesPorDeportista } = require('../middlewares');
+    existeDeportistaPorID,
+    noExistenContratacionesPorDeportista,
+    existeFechaApropiada } = require('../middlewares');
 
 const {
-    crearDeportista,
     obtenerDeportistas,
     obtenerDeportistaPorNombre,
     obtenerDeportistaPorID,
+    crearDeportista,
     actualizarDeportista,
     eliminarDeportista
 } = require('../controllers/deportistas');
@@ -24,30 +25,35 @@ router.get('/buscar', [
     validarCampos
 ], obtenerDeportistaPorNombre);
 
+// Obtener deportista por ID
+router.get('/:id', [
+    check('id', 'El ID es obligatorio').not().isEmpty(),
+    check('id').custom(existeDeportistaPorID),
+    validarCampos
+], obtenerDeportistaPorID);
+
 // Crear un nuevo deportista
 router.post('/', [
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('dorsal', 'El dorsal debe ser un número entero').isInt(),
-    check('posicion', 'La posición es obligatoria').not().isEmpty(),
-    check('sexo', 'El sexo debe ser Masculino, Femenino o Otro').isIn(['Masculino', 'Femenino', 'Otro']),
+    check('dorsal', 'El dorsal debe ser un número positivo').isInt({ min: 1 }),
+    check('fecha_nacimiento').custom(existeFechaApropiada),
     validarCampos
 ], crearDeportista);
 
 // Actualizar un deportista
-router.put('/', [
+router.put('/:id', [
     check('id', 'El ID es obligatorio').not().isEmpty(),
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('dorsal', 'El dorsal debe ser un número entero').optional().isInt(),
     check('posicion', 'La posición es obligatoria').optional().not().isEmpty(),
-    check('sexo', 'El sexo debe ser Masculino, Femenino o Otro').optional().isIn(['Masculino', 'Femenino', 'Otro']),
-    check('id').custom(existeDeportistaPorId),
+    check('sexo', 'El sexo debe ser MASCULINO, FEMENINO u OTRO').optional().isIn(['Masculino', 'Femenino', 'Otro']),
+    check('id').custom(existeDeportistaPorID),
     validarCampos
 ], actualizarDeportista);
 
 // Eliminar un deportista
 router.delete('/', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('id').custom(existeDeportistaPorId),
+    check('id').custom(existeDeportistaPorID),
     check('id').custom(noExistenContratacionesPorDeportista),
     validarCampos
 ], eliminarDeportista);

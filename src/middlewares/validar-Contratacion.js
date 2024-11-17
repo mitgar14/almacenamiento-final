@@ -1,7 +1,7 @@
 const { driver } = require('../database/Neo4jConnection');
 const neo4j = require('neo4j-driver');
 
-const existeContratacionPorId = async (id) => {
+const existeContratacionPorID = async (id) => {
   const session = driver.session();
   try {
     const result = await session.run(
@@ -17,5 +17,5 @@ const existeContratacionPorId = async (id) => {
 };
 
 module.exports = {
-  existeContratacionPorId
+  existeContratacionPorID
 };

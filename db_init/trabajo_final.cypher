@@ -2,75 +2,75 @@
 MATCH (n) DETACH DELETE n;
 
 // Crear Países
-MERGE (:Pais {nombre: "España"});
-MERGE (:Pais {nombre: "Alemania"});
-MERGE (:Pais {nombre: "Venezuela"});
-MERGE (:Pais {nombre: "Polonia"});
+MERGE (:Pais {nombre: "ESPAÑA"});
+MERGE (:Pais {nombre: "ALEMANIA"});
+MERGE (:Pais {nombre: "VENEZUELA"});
+MERGE (:Pais {nombre: "POLONIA"});
 
 // Crear Ciudades y relacionarlas con Países
 
 // Ciudades de Alemania
-MATCH (paisAlemania:Pais {nombre: "Alemania"})
-MERGE (c1:Ciudad {nombre: "Mönchengladbach"})-[:PERTENECE_A]->(paisAlemania)
-MERGE (c9:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(paisAlemania)
-MERGE (c13:Ciudad {nombre: "Rottweil"})-[:PERTENECE_A]->(paisAlemania);
+MATCH (paisAlemania:Pais {nombre: "ALEMANIA"})
+MERGE (c1:Ciudad {nombre: "MONCHENGLADBACH"})-[:PERTENECE_A]->(paisAlemania)
+MERGE (c9:Ciudad {nombre: "BREMEN"})-[:PERTENECE_A]->(paisAlemania)
+MERGE (c13:Ciudad {nombre: "ROTTWEIL"})-[:PERTENECE_A]->(paisAlemania);
 
 // Ciudades de Venezuela
-MATCH (paisVenezuela:Pais {nombre: "Venezuela"})
-MERGE (c6:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(paisVenezuela)
-MERGE (c12:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(paisVenezuela);
+MATCH (paisVenezuela:Pais {nombre: "VENEZUELA"})
+MERGE (c6:Ciudad {nombre: "ANACO"})-[:PERTENECE_A]->(paisVenezuela)
+MERGE (c12:Ciudad {nombre: "BARCELONA"})-[:PERTENECE_A]->(paisVenezuela);
 
 // Ciudades de Polonia
-MATCH (paisPolonia:Pais {nombre: "Polonia"})
-MERGE (c10:Ciudad {nombre: "Varsovia"})-[:PERTENECE_A]->(paisPolonia);
+MATCH (paisPolonia:Pais {nombre: "POLONIA"})
+MERGE (c10:Ciudad {nombre: "VARSOVIA"})-[:PERTENECE_A]->(paisPolonia);
 
 // Ciudades de España
-MATCH (paisEspaña:Pais {nombre: "España"})
-MERGE (c14:Ciudad {nombre: "Sabadell"})-[:PERTENECE_A]->(paisEspaña);
+MATCH (paisEspaña:Pais {nombre: "ESPAÑA"})
+MERGE (c14:Ciudad {nombre: "SABADELL"})-[:PERTENECE_A]->(paisEspaña);
 
 // Crear Deportes
-MERGE (:Deporte {nombre: "Fútbol"});
-MERGE (:Deporte {nombre: "Béisbol"});
+MERGE (:Deporte {nombre: "FUTBOL"});
+MERGE (:Deporte {nombre: "BEISBOL"});
 
 // Crear Equipos
-MERGE (:Equipo {nombre: "Barcelona"});
-MERGE (:Equipo {nombre: "Bayern Munich"});
-MERGE (:Equipo {nombre: "Caribes de Anzoátegui"});
+MERGE (:Equipo {nombre: "BARCELONA"});
+MERGE (:Equipo {nombre: "BAYERN MUNICH"});
+MERGE (:Equipo {nombre: "CARIBES DE ANZOATEGUI"});
 
 // Relacionar equipos con deportes y países
 
 // Barcelona
-MATCH (eBarcelona:Equipo {nombre: "Barcelona"}),
-      (dFutbol:Deporte {nombre: "Fútbol"}),
-      (paisEspaña:Pais {nombre: "España"})
+MATCH (eBarcelona:Equipo {nombre: "BARCELONA"}),
+      (dFutbol:Deporte {nombre: "FUTBOL"}),
+      (paisEspaña:Pais {nombre: "ESPAÑA"})
 MERGE (eBarcelona)-[:PRACTICA]->(dFutbol)
 MERGE (eBarcelona)-[:ES_DE]->(paisEspaña);
 
 // Bayern Munich
-MATCH (eBM:Equipo {nombre: "Bayern Munich"}),
-      (dFutbol:Deporte {nombre: "Fútbol"}),
-      (paisAlemania:Pais {nombre: "Alemania"})
+MATCH (eBM:Equipo {nombre: "BAYERN MUNICH"}),
+      (dFutbol:Deporte {nombre: "FUTBOL"}),
+      (paisAlemania:Pais {nombre: "ALEMANIA"})
 MERGE (eBM)-[:PRACTICA]->(dFutbol)
 MERGE (eBM)-[:ES_DE]->(paisAlemania);
 
 // Caribes de Anzoátegui
-MATCH (eCA:Equipo {nombre: "Caribes de Anzoátegui"}),
-      (dBeisbol:Deporte {nombre: "Béisbol"}),
-      (paisVenezuela:Pais {nombre: "Venezuela"})
+MATCH (eCA:Equipo {nombre: "CARIBES DE ANZOATEGUI"}),
+      (dBeisbol:Deporte {nombre: "BEISBOL"}),
+      (paisVenezuela:Pais {nombre: "VENEZUELA"})
 MERGE (eCA)-[:PRACTICA]->(dBeisbol)
 MERGE (eCA)-[:ES_DE]->(paisVenezuela);
 
 
 // Jugadores del FC Barcelona
 
-// Marc-André ter Stegen
-MATCH (c:Ciudad {nombre: "Mönchengladbach"})-[:PERTENECE_A]->(pais:Pais {nombre: "Alemania"}),
-      (eBarcelona:Equipo {nombre: "Barcelona"})
+// MARC-ANDRE TER STEGEN
+MATCH (c:Ciudad {nombre: "MONCHENGLADBACH"})-[:PERTENECE_A]->(pais:Pais {nombre: "ALEMANIA"}),
+      (eBarcelona:Equipo {nombre: "BARCELONA"})
 CREATE (d:Deportista {
-    nombre: "Marc-André ter Stegen",
-    posicion: "Portero",
+    nombre: "MARC-ANDRE TER STEGEN",
+    posicion: "PORTERO",
     dorsal: 1,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1992-04-30")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -84,13 +84,13 @@ CREATE (d)-[:TIENE_CONTRATO]->(contrato)
 CREATE (contrato)-[:CONTRATO_CON]->(eBarcelona);
 
 // Robert Lewandowski
-MATCH (c:Ciudad {nombre: "Varsovia"})-[:PERTENECE_A]->(pais:Pais {nombre: "Polonia"}),
-      (eBarcelona:Equipo {nombre: "Barcelona"})
+MATCH (c:Ciudad {nombre: "VARSOVIA"})-[:PERTENECE_A]->(pais:Pais {nombre: "POLONIA"}),
+      (eBarcelona:Equipo {nombre: "BARCELONA"})
 CREATE (d:Deportista {
-    nombre: "Robert Lewandowski",
-    posicion: "Delantero",
+    nombre: "ROBERT LEWANDOWSKI",
+    posicion: "DELANTERO",
     dorsal: 9,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1988-08-21")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -104,13 +104,13 @@ CREATE (d)-[:TIENE_CONTRATO]->(contrato)
 CREATE (contrato)-[:CONTRATO_CON]->(eBarcelona);
 
 // Pedri
-MATCH (c:Ciudad {nombre: "Sabadell"})-[:PERTENECE_A]->(pais:Pais {nombre: "España"}),
-      (eBarcelona:Equipo {nombre: "Barcelona"})
+MATCH (c:Ciudad {nombre: "SABADELL"})-[:PERTENECE_A]->(pais:Pais {nombre: "ESPAÑA"}),
+      (eBarcelona:Equipo {nombre: "BARCELONA"})
 CREATE (d:Deportista {
-    nombre: "Pedri",
-    posicion: "Centrocampista Ofensivo",
+    nombre: "PEDRI",
+    posicion: "CENTROCAMPISTA OFENSIVO",
     dorsal: 8,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("2002-11-25")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -127,13 +127,13 @@ CREATE (contrato)-[:CONTRATO_CON]->(eBarcelona);
 // Jugadores del Bayern Munich
 
 // Manuel Neuer
-MATCH (c:Ciudad {nombre: "Bremen"})-[:PERTENECE_A]->(pais:Pais {nombre: "Alemania"}),
-      (eBM:Equipo {nombre: "Bayern Munich"})
+MATCH (c:Ciudad {nombre: "BREMEN"})-[:PERTENECE_A]->(pais:Pais {nombre: "ALEMANIA"}),
+      (eBM:Equipo {nombre: "BAYERN MUNICH"})
 CREATE (d:Deportista {
-    nombre: "Manuel Neuer",
-    posicion: "Portero",
+    nombre: "MANUEL NEUER",
+    posicion: "PORTERO",
     dorsal: 1,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1986-03-27")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -147,13 +147,13 @@ CREATE (d)-[:TIENE_CONTRATO]->(contrato)
 CREATE (contrato)-[:CONTRATO_CON]->(eBM);
 
 // Joshua Kimmich
-MATCH (c:Ciudad {nombre: "Rottweil"})-[:PERTENECE_A]->(pais:Pais {nombre: "Alemania"}),
-      (eBM:Equipo {nombre: "Bayern Munich"})
+MATCH (c:Ciudad {nombre: "ROTTWEIL"})-[:PERTENECE_A]->(pais:Pais {nombre: "ALEMANIA"}),
+      (eBM:Equipo {nombre: "BAYERN MUNICH"})
 CREATE (d:Deportista {
-    nombre: "Joshua Kimmich",
-    posicion: "Centrocampista Defensivo",
+    nombre: "JOSHUA KIMMICH",
+    posicion: "CENTROCAMPISTA DEFENSIVO",
     dorsal: 6,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1995-02-08")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -170,13 +170,13 @@ CREATE (contrato)-[:CONTRATO_CON]->(eBM);
 // Jugadores de Caribes de Anzoátegui
 
 // Oswaldo Arcia
-MATCH (c:Ciudad {nombre: "Anaco"})-[:PERTENECE_A]->(pais:Pais {nombre: "Venezuela"}),
-      (eCA:Equipo {nombre: "Caribes de Anzoátegui"})
+MATCH (c:Ciudad {nombre: "ANACO"})-[:PERTENECE_A]->(pais:Pais {nombre: "VENEZUELA"}),
+      (eCA:Equipo {nombre: "CARIBES DE ANZOATEGUI"})
 CREATE (d:Deportista {
-    nombre: "Oswaldo Arcia",
-    posicion: "Jardinero",
+    nombre: "OSWALDO ARCIA",
+    posicion: "JARDINERO",
     dorsal: 9,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1991-05-09")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)
@@ -190,13 +190,13 @@ CREATE (d)-[:TIENE_CONTRATO]->(contrato)
 CREATE (contrato)-[:CONTRATO_CON]->(eCA);
 
 // Willians Astudillo
-MATCH (c:Ciudad {nombre: "Barcelona"})-[:PERTENECE_A]->(pais:Pais {nombre: "Venezuela"}),
-      (eCA:Equipo {nombre: "Caribes de Anzoátegui"})
+MATCH (c:Ciudad {nombre: "BARCELONA"})-[:PERTENECE_A]->(pais:Pais {nombre: "VENEZUELA"}),
+      (eCA:Equipo {nombre: "CARIBES DE ANZOATEGUI"})
 CREATE (d:Deportista {
-    nombre: "Willians Astudillo",
-    posicion: "Receptor",
+    nombre: "WILLIANS ASTUDILLO",
+    posicion: "RECEPTOR",
     dorsal: 37,
-    sexo: "Masculino"
+    sexo: "MASCULINO"
 })
 CREATE (d)-[:NACE_EN {fecha_nacimiento: date("1991-10-14")}]->(c)
 CREATE (d)-[:ES_DE]->(pais)

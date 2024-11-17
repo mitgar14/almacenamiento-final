@@ -6,7 +6,6 @@ const crearEquipo = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     try {
-        // Crear un equipo y establecer relaciones según la estructura del .cypher
         const equipo = await Equipo.create(req.body);
         res.status(201).json(equipo);
     } catch (error) {
@@ -16,7 +15,6 @@ const crearEquipo = async (req, res) => {
 
 const obtenerEquipos = async (req, res) => {
     try {
-        // Obtener todos los equipos con sus relaciones (Deporte y País)
         const equipos = await Equipo.getAllWithRelations();
         res.status(200).json(equipos);
     } catch (error) {
@@ -27,7 +25,6 @@ const obtenerEquipos = async (req, res) => {
 const obtenerEquiposPorPais = async (req, res) => {
     const { pais } = req.params;
     try {
-        // Obtener equipos asociados a un país
         const equipos = await Equipo.getByPais(pais);
         res.status(200).json(equipos);
     } catch (error) {
@@ -38,7 +35,6 @@ const obtenerEquiposPorPais = async (req, res) => {
 const obtenerEquiposPorDeporte = async (req, res) => {
     const { deporte } = req.params;
     try {
-        // Obtener equipos asociados a un deporte
         const equipos = await Equipo.getByDeporte(deporte);
         res.status(200).json(equipos);
     } catch (error) {
@@ -52,7 +48,6 @@ const actualizarEquipo = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     try {
-        // Actualizar un equipo por su ID
         const equipoActualizado = await Equipo.update(id, req.body);
         if (!equipoActualizado) return res.status(404).json({ error: 'Equipo no encontrado' });
         res.status(200).json(equipoActualizado);
@@ -64,7 +59,6 @@ const actualizarEquipo = async (req, res) => {
 const eliminarEquipo = async (req, res) => {
     const { id } = req.params;
     try {
-        // Eliminar un equipo y sus relaciones
         const resultado = await Equipo.delete(id);
         if (!resultado) return res.status(404).json({ error: 'Equipo no encontrado' });
         res.status(200).json({ message: 'Equipo eliminado exitosamente' });

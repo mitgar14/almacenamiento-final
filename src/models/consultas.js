@@ -27,8 +27,8 @@ class Consultas {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista {sexo: 'Masculino'})-[:PERTENECE_A]->(e:Equipo)-[:ES_DE]->(p:Pais {nombre: 'España'})
-                 WHERE e.deporte = 'Fútbol'
+        `MATCH (d:Deportista {sexo: 'MASCULINO'})-[:PERTENECE_A]->(e:Equipo)-[:ES_DE]->(p:Pais {nombre: 'España'})
+                 WHERE e.deporte = 'FUTBOL'
                  RETURN d, e, p`
       );
       return result.records.map((record) => ({

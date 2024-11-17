@@ -23,9 +23,9 @@ const obtenerContrataciones = async (req, res) => {
 };
 
 const obtenerContratacionPorDeportistaYEquipo = async (req, res) => {
-    const { deportistaId, equipoId } = req.params;
+    const { deportistaID, equipoID } = req.params;
     try {
-        const contratacion = await Contratacion.getByDeportistaAndEquipo(deportistaId, equipoId);
+        const contratacion = await Contratacion.getByDeportistaAndEquipo(deportistaID, equipoID);
         if (!contratacion) return res.status(404).json({ error: 'Contratación no encontrada' });
         res.status(200).json(contratacion);
     } catch (error) {
@@ -34,12 +34,12 @@ const obtenerContratacionPorDeportistaYEquipo = async (req, res) => {
 };
 
 const actualizarContratacion = async (req, res) => {
-    const { deportistaId, equipoId } = req.params;
+    const { deportistaID, equipoID } = req.params;
     const { error } = contratacionSchema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     try {
-        const contratacionActualizada = await Contratacion.update(deportistaId, equipoId, req.body);
+        const contratacionActualizada = await Contratacion.update(deportistaID, equipoID, req.body);
         if (!contratacionActualizada) return res.status(404).json({ error: 'Contratación no encontrada' });
         res.status(200).json(contratacionActualizada);
     } catch (error) {
@@ -48,9 +48,9 @@ const actualizarContratacion = async (req, res) => {
 };
 
 const eliminarContratacion = async (req, res) => {
-    const { deportistaId, equipoId } = req.params;
+    const { deportistaID, equipoID } = req.params;
     try {
-        const resultado = await Contratacion.delete(deportistaId, equipoId);
+        const resultado = await Contratacion.delete(deportistaID, equipoID);
         if (!resultado) return res.status(404).json({ error: 'Contratación no encontrada' });
         res.status(200).json({ message: 'Contratación eliminada exitosamente' });
     } catch (error) {

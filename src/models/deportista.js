@@ -1,6 +1,11 @@
 const neo4j = require("neo4j-driver");
 const { driver } = require("../database/Neo4jConnection");
-const { RelacionesDeportistas } = require("../services/relaciones");
+
+const Pais = require("./pais");
+const Ciudad = require("./ciudad");
+const Contratacion = require("./contratacion");
+
+const standardizeString = require("../helpers/string");
 
 class Deportista {
   // Obtener todos los deportistas
@@ -12,15 +17,19 @@ class Deportista {
       const deportistas = await Promise.all(
         result.records.map(async (record) => {
           const props = record.get("d").properties;
-          const deportistaId = record.get("d").identity.toNumber();
+          const deportistaID = record.get("d").identity.toNumber();
 
-          const relaciones = await RelacionesDeportistas.getCiudadYContratosParaDeportistas(deportistaId);
+          const ciudad = await Ciudad.getByDeportista(deportistaID);
+          const contratos = await Contratacion.getResumenByDeportista(
+            deportistaID
+          );
 
           return {
-            id: deportistaId,
+            id: deportistaID,
             ...props,
             dorsal: props.dorsal.toNumber(),
-            ...relaciones,
+            ciudadNacimiento: ciudad,
+            contratos,
           };
         })
       );
@@ -39,29 +48,154 @@ class Deportista {
         `MATCH (d:Deportista) WHERE d.nombre CONTAINS $nombre RETURN d`,
         { nombre }
       );
-      return result.records.map((record) => {
-        const props = record.get("d").properties;
-        props.dorsal = props.dorsal.toNumber();
-        return props;
-      });
+
+      const deportistas = await Promise.all(
+        result.records.map(async (record) => {
+          const props = record.get("d").properties;
+          const deportistaID = record.get("d").identity.toNumber();
+
+          const ciudad = await Ciudad.getByDeportista(deportistaID);
+          const contratos = await Contratacion.getResumenByDeportista(
+            deportistaID
+          );
+
+          return {
+            id: deportistaID,
+            ...props,
+            dorsal: props.dorsal.toNumber(),
+            ciudadNacimiento: ciudad,
+            contratos,
+          };
+        })
+      );
+
+      return deportistas;
     } finally {
       await session.close();
     }
   }
 
-  static async create({ nombre, dorsal, posicion, sexo }) {
+  // Obtener un deportista por su ID en Neo4j
+  static async getByID(deportistaID) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `CREATE (d:Deportista {nombre: $nombre, dorsal: $dorsal, posicion: $posicion, sexo: $sexo})
-                 RETURN d`,
+        `MATCH (d:Deportista) 
+         WHERE id(d) = $deportistaID 
+         RETURN d`,
+        { deportistaID: neo4j.int(deportistaID) }
+      );
+
+      if (!result.records.length) return null;
+
+      const record = result.records[0];
+      const props = record.get("d").properties;
+      const id = record.get("d").identity.toNumber();
+
+      // Obtener información relacionada
+      const ciudad = await Ciudad.getByDeportista(id);
+      const contratos = await Contratacion.getResumenByDeportista(id);
+
+      return {
+        id,
+        ...props,
+        dorsal: props.dorsal.toNumber(),
+        ciudadNacimiento: ciudad,
+        contratos,
+      };
+    } finally {
+      await session.close();
+    }
+  }
+
+  static async create({
+    nombre,
+    dorsal,
+    posicion,
+    sexo,
+    fecha_nacimiento,
+    ciudad,
+    pais,
+  }) {
+    const session = driver.session();
+    try {
+      let ciudadID;
+      let paisID;
+  
+      // Estandarizar los campos
+      nombre = standardizeString(nombre);
+      posicion = standardizeString(posicion);
+      sexo = standardizeString(sexo);
+  
+      // Procesar el país
+      let paisData;
+      if (typeof pais === "number" && pais > 0) {
+        paisData = await Pais.getByID(pais);
+        if (!paisData) {
+          throw new Error("País no encontrado");
+        }
+        paisID = paisData.id;
+      } else if (typeof pais === "string") {
+        const paisName = standardizeString(pais);
+        paisData = await Pais.getByName(paisName);
+        if (!paisData) {
+          throw new Error("País no encontrado");
+        }
+        paisID = paisData.id;
+      } else {
+        throw new Error("País no válido");
+      }
+  
+      // Procesar la ciudad
+      let ciudadData;
+      if (typeof ciudad === "number" && ciudad > 0) {
+        ciudadData = await Ciudad.getByID(ciudad);
+        if (!ciudadData) {
+          throw new Error("Ciudad no encontrada");
+        }
+        ciudadID = ciudadData.id;
+      } else if (typeof ciudad === "string") {
+        const ciudadName = standardizeString(ciudad);
+        ciudadData = await Ciudad.getByName(ciudadName);
+        if (!ciudadData) {
+          if (!paisID || !Number.isInteger(paisID) || paisID <= 0) {
+            throw new Error("País no válido para crear la ciudad");
+          }
+          ciudadData = await Ciudad.create({ nombre: ciudadName, paisID });
+        }
+        ciudadID = ciudadData.id;
+      } else {
+        throw new Error("Ciudad no válida");
+      }
+  
+      // Crear el deportista
+      const result = await session.run(
+        `MATCH (c:Ciudad), (p:Pais)
+         WHERE id(c) = $ciudadID AND id(p) = $paisID
+         CREATE (d:Deportista {
+           nombre: $nombre, 
+           dorsal: $dorsal, 
+           posicion: $posicion, 
+           sexo: $sexo
+         })
+         CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
+         CREATE (d)-[:ES_DE]->(p)
+         RETURN d`,
         {
           nombre,
           dorsal: neo4j.int(dorsal),
           posicion,
           sexo,
+          fecha_nacimiento,
+          ciudadID: neo4j.int(ciudadID),
+          paisID: neo4j.int(paisID),
         }
       );
+  
+      if (!result.records.length) {
+        throw new Error("Error al crear el deportista");
+      }
+  
       const deportista = result.records[0].get("d").properties;
       deportista.dorsal = deportista.dorsal.toNumber();
       return deportista;

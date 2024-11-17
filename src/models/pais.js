@@ -3,16 +3,19 @@ const driver = require('../database/Neo4jConnection').driver;
 
 class Pais {
     // Crear un nuevo país
-    static async create({ nombre, poblacion, region }) {
+    static async create({ nombre }) {
         const session = driver.session();
         try {
             const result = await session.run(
                 `MERGE (p:Pais {nombre: $nombre})
-                 ON CREATE SET p.poblacion = $poblacion, p.region = $region
-                 RETURN p`,
-                { nombre, poblacion, region }
+                 RETURN p, id(p) as id`,
+                { nombre }
             );
-            return result.records[0].get('p').properties;
+            const record = result.records[0];
+            return {
+                id: record.get('id').toNumber(),
+                ...record.get('p').properties
+            };
         } finally {
             await session.close();
         }
@@ -22,8 +25,14 @@ class Pais {
     static async getAll() {
         const session = driver.session();
         try {
-            const result = await session.run(`MATCH (p:Pais) RETURN p`);
-            return result.records.map(record => record.get('p').properties);
+            const result = await session.run(
+                `MATCH (p:Pais)
+                 RETURN p, id(p) as id`
+            );
+            return result.records.map(record => ({
+                id: record.get('id').toNumber(),
+                ...record.get('p').properties
+            }));
         } finally {
             await session.close();
         }
@@ -34,10 +43,53 @@ class Pais {
         const session = driver.session();
         try {
             const result = await session.run(
-                `MATCH (p:Pais {nombre: $nombre}) RETURN p`,
+                `MATCH (p:Pais {nombre: $nombre})
+                 RETURN p, id(p) as id`,
                 { nombre }
             );
-            return result.records.length ? result.records[0].get('p').properties : null;
+            if (!result.records.length) return null;
+            
+            const record = result.records[0];
+            return {
+                id: record.get('id').toNumber(),
+                ...record.get('p').properties
+            };
+        } finally {
+            await session.close();
+        }
+    }
+
+    // Obtener un país por su ID
+    static async getByID(paisID) {
+      const session = driver.session();
+      try {
+        const result = await session.run(
+          `MATCH (p:Pais)
+           WHERE id(p) = $paisID
+           RETURN p, id(p) as id`,
+          { paisID: neo4j.int(paisID) }
+        );
+        if (!result.records.length) return null;
+    
+        const record = result.records[0];
+        return {
+          id: record.get('id').toNumber(),
+          ...record.get('p').properties
+        };
+      } finally {
+        await session.close();
+      }
+    }
+
+    // Eliminar un país
+    static async delete(nombre) {
+        const session = driver.session();
+        try {
+            await session.run(
+                `MATCH (p:Pais {nombre: $nombre})
+                 DETACH DELETE p`,
+                { nombre }
+            );
         } finally {
             await session.close();
         }
