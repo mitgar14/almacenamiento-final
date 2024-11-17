@@ -34,7 +34,12 @@ router.get('/:id', [
 
 // Crear un nuevo deportista
 router.post('/', [
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('dorsal', 'El dorsal debe ser un número positivo').isInt({ min: 1 }),
+    check('posicion', 'La posición es obligatoria').not().isEmpty(),
+    check('sexo', 'El sexo debe ser MASCULINO, FEMENINO u OTRO').isIn(['Masculino', 'Femenino', 'Otro']),
+    check("ciudad", "El nombre o el ID de la ciudad es obligatorio").not().isEmpty(),
+    check("pais", "El nombre o el ID del país es obligatorio").not().isEmpty(),
     check('fecha_nacimiento').custom(existeFechaApropiada),
     validarCampos
 ], crearDeportista);
