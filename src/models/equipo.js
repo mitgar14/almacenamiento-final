@@ -30,13 +30,14 @@ class Equipo {
     try {
       const result = await session.run(
         `MATCH (e:Equipo)-[:ES_DE]->(p:Pais), 
-                       (e)-[:PRACTICA]->(d:Deporte),
-                       (e)<-[:JUEGA_EN]-(dep:Deportista)
-                 WITH e, p, d, collect(dep) as deportistas
-                 RETURN e, p.nombre AS pais, d.nombre AS deporte, 
-                        size(deportistas) as num_deportistas`
+               (e)-[:PRACTICA]->(d:Deporte),
+               (e)<-[:JUEGA_EN]-(dep:Deportista)
+         WITH e, p, d, collect(dep) as deportistas
+         RETURN id(e) as id, e, p.nombre AS pais, d.nombre AS deporte, 
+                size(deportistas) as num_deportistas`
       );
       return result.records.map((record) => ({
+        id: record.get("id").toNumber(),
         ...record.get("e").properties,
         pais: record.get("pais"),
         deporte: record.get("deporte"),

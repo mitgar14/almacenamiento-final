@@ -4,4 +4,4 @@ function formatDate(neoDate) {
     return `${neoDate.year.low}-${String(neoDate.month.low).padStart(2, '0')}-${String(neoDate.day.low).padStart(2, '0')}`;
 }
 
-module.exports = { formatDate };
+module.exports = formatDate;

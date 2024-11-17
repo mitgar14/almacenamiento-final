@@ -1,3 +1,4 @@
+
 const Ciudad = require("../models/ciudad");
 const Contratacion = require("../models/contratacion");
 
@@ -13,4 +14,6 @@ class RelacionesDeportistas {
   }
 }
 
-module.exports = { RelacionesDeportistas };
+
+module.exports = {  RelacionesDeportistas
+ };

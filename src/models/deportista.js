@@ -3,6 +3,7 @@ const { driver } = require("../database/Neo4jConnection");
 const { RelacionesDeportistas } = require("../services/relaciones");
 
 class Deportista {
+  // Obtener todos los deportistas
   static async getAll() {
     const session = driver.session();
     try {
@@ -11,11 +12,12 @@ class Deportista {
       const deportistas = await Promise.all(
         result.records.map(async (record) => {
           const props = record.get("d").properties;
-          const deportistaId = record.get("d").identity;
+          const deportistaId = record.get("d").identity.toNumber();
 
           const relaciones = await RelacionesDeportistas.getCiudadYContratosParaDeportistas(deportistaId);
 
           return {
+            id: deportistaId,
             ...props,
             dorsal: props.dorsal.toNumber(),
             ...relaciones,

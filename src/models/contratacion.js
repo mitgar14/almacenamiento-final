@@ -1,27 +1,48 @@
 const neo4j = require("neo4j-driver");
 const driver = require("../database/Neo4jConnection").driver;
 const Equipo = require("../models/equipo");
-const { formatDate } = require("../helpers/date");
+const formatDate = require("../helpers/date");
 
 class Contratacion {
   // Obtener todas las contrataciones
   static async getAll() {
-    const session = driver.session();
-    try {
-      const result = await session.run(
-        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
-         RETURN d, c, e`
-      );
-      return result.records.map((record) => ({
-        deportista: record.get("d").properties,
-        equipo: record.get("e").properties,
-        contrato: record.get("c").properties,
-      }));
-    } finally {
-      await session.close();
-    }
+      const session = driver.session();
+      try {
+        const result = await session.run(
+          `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+           RETURN d, c, e, id(e) as equipoId, id(c) as contratoId`
+        );
+    
+        const equiposInfo = await Equipo.getAllWithRelations();
+    
+        return result.records.map((record) => {
+          const deportista = record.get("d").properties;
+          const equipoId = record.get("equipoId").toNumber();
+          const equipoBasico = record.get("e").properties;
+          const contrato = record.get("c").properties;
+          const contratoId = record.get("contratoId").toNumber();
+    
+          const equipoCompleto = equiposInfo.find(e => e.id === equipoId);
+          const { id, ...equipoSinId } = equipoCompleto || equipoBasico;
+    
+          return {
+            deportista: {
+              ...deportista,
+              dorsal: deportista.dorsal.toNumber(),
+            },
+            equipo: equipoSinId,
+            contrato: {
+              id: contratoId,
+              fecha_inicio: formatDate(contrato.fecha_inicio),
+              fecha_fin: formatDate(contrato.fecha_fin),
+              valor_contrato: contrato.valor_contrato.toNumber(),
+            },
+          };
+        });
+      } finally {
+        await session.close();
+      }
   }
-
   // Obtener todas las contrataciones de un deportista
   static async getByDeportista(deportistaId) {
     const session = driver.session();
@@ -29,50 +50,53 @@ class Contratacion {
       const result = await session.run(
         `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(contrato:Contrato)-[:CONTRATO_CON]->(e:Equipo)
          WHERE id(d) = $deportistaId
-         RETURN contrato, id(e) as equipoId, contrato.fecha_fin >= date() as activo`,
+         RETURN contrato, e, id(e) as equipoId`,
         { deportistaId }
       );
-
-      const contratos = await Promise.all(
-        result.records.map(async (record) => {
-          const contratoProps = record.get("contrato").properties;
-          const equipoId = record.get("equipoId");
-          const activo = record.get("activo");
-
-          const equiposInfo = await Equipo.getAllWithRelations();
-          const equipo = equiposInfo.find(e => e.id === equipoId);
-
-          return {
-            contrato: {
-              fecha_inicio: formatDate(contratoProps.fecha_inicio),
-              fecha_fin: formatDate(contratoProps.fecha_fin),
-              valor_contrato: contratoProps.valor_contrato.toNumber(),
-            },
-            equipo,
-            activo
-          };
-        })
+  
+      const equiposInfo = await Equipo.getAllWithRelations();
+  
+      const contratos = result.records.map((record) => {
+        const contratoProps = record.get("contrato").properties;
+        const equipoId = record.get("equipoId").toNumber();
+        const equipoBasico = record.get("e").properties;
+        
+        const equipoCompleto = equiposInfo.find(e => e.id === equipoId);
+        
+        const { id, ...equipoSinId } = equipoCompleto || equipoBasico;
+  
+        return {
+          fecha_inicio: formatDate(contratoProps.fecha_inicio),
+          fecha_fin: formatDate(contratoProps.fecha_fin),
+          valor_contrato: contratoProps.valor_contrato.toNumber(),
+          equipo: equipoSinId
+        };
+      });
+  
+      const fechaActual = new Date();
+      const activos = contratos.filter(
+        (c) => new Date(c.fecha_fin) > fechaActual
       );
-
-      const activos = contratos.filter(c => c.activo);
-      const antiguos = contratos.filter(c => !c.activo);
-
+      const antiguos = contratos.filter(
+        (c) => new Date(c.fecha_fin) <= fechaActual
+      );
+  
       return {
         total_contratos: contratos.length,
-        activos,
-        antiguos,
         resumen: {
           activos: activos.length,
           antiguos: antiguos.length
-        }
+        },
+        activos,
+        antiguos
       };
-
+  
     } finally {
       await session.close();
     }
   }
 
-  // Obtener una contratación específica 
+  // Obtener una contratación específica
   static async getByDeportistaAndEquipo(deportistaId, equipoId) {
     const session = driver.session();
     try {
@@ -84,11 +108,11 @@ class Contratacion {
       );
       const record = result.records[0];
       if (!record) return null;
-      
+
       return {
         deportista: record.get("d").properties,
         equipo: record.get("e").properties,
-        contrato: record.get("c").properties
+        contrato: record.get("c").properties,
       };
     } finally {
       await session.close();
@@ -96,7 +120,13 @@ class Contratacion {
   }
 
   // Crear una nueva contratación
-  static async create({ fecha_inicio, fecha_fin, valor_contrato, deportistaId, equipoId }) {
+  static async create({
+    fecha_inicio,
+    fecha_fin,
+    valor_contrato,
+    deportistaId,
+    equipoId,
+  }) {
     const session = driver.session();
     try {
       const result = await session.run(
@@ -112,12 +142,12 @@ class Contratacion {
          RETURN d, contrato, e`,
         { deportistaId, equipoId, fecha_inicio, fecha_fin, valor_contrato }
       );
-      
+
       const record = result.records[0];
       return {
         deportista: record.get("d").properties,
         equipo: record.get("e").properties,
-        contrato: record.get("contrato").properties
+        contrato: record.get("contrato").properties,
       };
     } finally {
       await session.close();
@@ -125,7 +155,11 @@ class Contratacion {
   }
 
   // Actualizar una contratación
-  static async update(deportistaId, equipoId, { fecha_inicio, fecha_fin, valor_contrato }) {
+  static async update(
+    deportistaId,
+    equipoId,
+    { fecha_inicio, fecha_fin, valor_contrato }
+  ) {
     const session = driver.session();
     try {
       const result = await session.run(
@@ -137,13 +171,15 @@ class Contratacion {
          RETURN d, c, e`,
         { deportistaId, equipoId, fecha_inicio, fecha_fin, valor_contrato }
       );
-      
+
       const record = result.records[0];
-      return record ? {
-        deportista: record.get("d").properties,
-        equipo: record.get("e").properties,
-        contrato: record.get("c").properties
-      } : null;
+      return record
+        ? {
+            deportista: record.get("d").properties,
+            equipo: record.get("e").properties,
+            contrato: record.get("c").properties,
+          }
+        : null;
     } finally {
       await session.close();
     }
