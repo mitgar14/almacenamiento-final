@@ -1,0 +1,617 @@
+{
+	"info": {
+		"_postman_id": "55e82f4a-bb79-4ff8-ab10-1480e2a5c3d4",
+		"name": "3.4. (Almacenamiento) API Proyecto - neo4j",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33335468"
+	},
+	"item": [
+		{
+			"name": "Deportistas",
+			"item": [
+				{
+					"name": "getDeportistas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getDeportistasNombre",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/buscar?nombre=ssi",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								"buscar"
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "ssi"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getDeportistasID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/281",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								"281"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postDeportista",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Lionel Messi\",\r\n    \"dorsal\": 10,\r\n    \"posicion\": \"Delantero\",\r\n    \"sexo\": \"Masculino\",\r\n    \"fecha_nacimiento\": \"1987-06-24\",\r\n    \"ciudad\": \"Rosario\",\r\n    \"pais\": \"Argentina\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "putDeportista",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Lionel Messi\",\r\n    \"dorsal\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/297",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								"297"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteDeportista",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deportistas/297",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deportistas",
+								"297"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Equipos",
+			"item": [
+				{
+					"name": "getEquipos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/equipos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"equipos",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postEquipo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Inter Miami CF\",\r\n    \"pais\": \"Estados Unidos\",\r\n    \"deporte\": \"futbol\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/equipos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"equipos",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "putEquipo",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Inter Miami Cf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/equipos/299",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"equipos",
+								"299"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteEquipo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/equipos/299",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"equipos",
+								"299"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contrataciones",
+			"item": [
+				{
+					"name": "getContrataciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/contrataciones/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contrataciones",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postContratacion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"deportistaID\": 297,\r\n    \"equipoID\": 299,\r\n    \"fecha_inicio\": \"2023-07-15\",\r\n    \"fecha_fin\": \"2025-12-31\",\r\n    \"valor_contrato\": 25000000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contrataciones/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contrataciones",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "putContratacion",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fecha_inicio\": \"2023-01-15\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contrataciones/300",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contrataciones",
+								"300"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteContratacion",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/contrataciones/300",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contrataciones",
+								"300"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Consultas - Profe",
+			"item": [
+				{
+					"name": "Deportistas con contratos a partir de una fecha específica",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/contratos-desde?fecha=2014-01-01",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"contratos-desde"
+							],
+							"query": [
+								{
+									"key": "fecha",
+									"value": "2014-01-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deportistas masculinos en equipos de fútbol de España",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/masculinos-futbol-espana",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"masculinos-futbol-espana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deportistas españoles en equipos españoles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/deportistas-espana-equipos-espana",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"deportistas-espana-equipos-espana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deportistas con contratos superiores a 1,000,000",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/contratos-altos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"contratos-altos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cantidad de deportistas por equipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/deportistas-por-equipo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"deportistas-por-equipo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Consultas - Grupo",
+			"item": [
+				{
+					"name": "Equipos con más de 3 deportistas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/equipos-mas-3-deportistas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"equipos-mas-3-deportistas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deportistas por cada deporte",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/deportistas-por-deporte-minimo-1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"deportistas-por-deporte-minimo-1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Contratos que terminan en los próximos 6 meses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/contratos-terminan-en-6-meses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"contratos-terminan-en-6-meses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Equipos con al menos un contrato activo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/equipos-contratos-activos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"equipos-contratos-activos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deportistas con contratos de duración superior a 3 años",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/consultas/deportistas-contratos-largos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"consultas",
+								"deportistas-contratos-largos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
