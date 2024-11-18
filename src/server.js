@@ -6,7 +6,7 @@ class Server {
 
     constructor() {
         this.app = express();
-        this.port = process.env.PORT || 8086;
+        this.port = process.env.PORT || 8080;
 
         this.pathsNeo4j = {
             equipos: '/api/equipos',
