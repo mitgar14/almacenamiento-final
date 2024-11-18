@@ -116,10 +116,10 @@ class Deportista {
   static async create(datos) {
     const session = driver.session();
     try {
-      // Estandarizar los campos
-      datos.nombre = standardizeString(datos.nombre);
-      datos.posicion = standardizeString(datos.posicion);
-      datos.sexo = standardizeString(datos.sexo);
+      const nombre = standardizeString(datos.nombre);
+      const posicion = standardizeString(datos.posicion);
+      const sexo = standardizeString(datos.sexo);
+      const { dorsal, fecha_nacimiento } = datos;
 
       // Procesar el país y la ciudad
       const paisID = await Pais.getOrCreatePais(datos.pais);
@@ -128,16 +128,16 @@ class Deportista {
       // Crear el deportista y sus relaciones
       const result = await session.run(
         `MATCH (c:Ciudad), (p:Pais)
-           WHERE id(c) = $ciudadID AND id(p) = $paisID
-           CREATE (d:Deportista {
-             nombre: $nombre,
-             dorsal: $dorsal,
-             posicion: $posicion,
-             sexo: $sexo
-           })
-           CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
-           CREATE (d)-[:ES_DE]->(p)
-           RETURN d`,
+             WHERE id(c) = $ciudadID AND id(p) = $paisID
+             CREATE (d:Deportista {
+               nombre: $nombre,
+               dorsal: $dorsal,
+               posicion: $posicion,
+               sexo: $sexo
+             })
+             CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
+             CREATE (d)-[:ES_DE]->(p)
+             RETURN d`,
         {
           nombre,
           dorsal: neo4j.int(dorsal),

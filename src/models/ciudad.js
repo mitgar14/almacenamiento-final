@@ -1,8 +1,7 @@
-// models/ciudad.js
-
 const neo4j = require('neo4j-driver');
 const driver = require('../database/Neo4jConnection').driver;
 
+const standardizeString = require("../helpers/string");
 class Ciudad {
   // Obtener o crear una ciudad (para Deportistas)
   static async getOrCreateCiudad(ciudad, paisID) {
