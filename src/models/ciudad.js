@@ -1,5 +1,7 @@
-const neo4j = require("neo4j-driver");
-const { driver } = require("../database/Neo4jConnection");
+// models/ciudad.js
+
+const neo4j = require('neo4j-driver');
+const driver = require('../database/Neo4jConnection').driver;
 
 class Ciudad {
   // Crear una nueva ciudad
@@ -9,48 +11,57 @@ class Ciudad {
       const result = await session.run(
         `MATCH (p:Pais) WHERE id(p) = $paisID
          CREATE (c:Ciudad {nombre: $nombre})-[:PERTENECE_A]->(p)
-         RETURN c`,
-        { nombre, paisID: neo4j.int(paisID) }
+         RETURN c, id(c) AS ciudadId, p.nombre AS pais`,
+        { 
+          nombre, 
+          paisID: neo4j.int(paisID) 
+        }
       );
-      return result.records[0].get("c").properties;
+
+      console.log("Resultado de crear ciudad:", result);
+
+      if (result.records.length === 0) {
+        throw new Error("No se devolvieron registros al crear la ciudad.");
+      }
+
+      const record = result.records[0];
+
+      const createdId = record.get('ciudadId');
+      const createdCiudad = record.get('c').properties;
+      const paisName = record.get('pais');
+
+      if (!createdId) {
+        throw new Error("No se pudo obtener el ID de la ciudad creada.");
+      }
+
+      return {
+        id: createdId.toNumber(),
+        ...createdCiudad,
+        pais: paisName
+      };
     } finally {
       await session.close();
     }
   }
 
-  // Obtener todas las ciudades con su país
-  static async getAll() {
-    const session = driver.session();
-    try {
-      const result = await session.run(
-        `MATCH (c:Ciudad)-[:PERTENECE_A]->(p:Pais)
-         RETURN c, p.nombre as pais`
-      );
-      return result.records.map(record => ({
-        ...record.get("c").properties,
-        pais: record.get("pais")
-      }));
-    } finally {
-      await session.close();
-    }
-  }
-
-  // Obtener ciudad por deportista
+  // Obtener ciudad por Deportista ID
   static async getByDeportista(deportistaID) {
     const session = driver.session();
     try {
       const result = await session.run(
         `MATCH (d:Deportista)-[:NACE_EN]->(c:Ciudad)-[:PERTENECE_A]->(p:Pais)
          WHERE id(d) = $deportistaID
-         RETURN c, p.nombre as pais`,
-        { deportistaID }
+         RETURN c, id(c) AS id, p.nombre AS pais`,
+        { deportistaID: neo4j.int(deportistaID) }
       );
+
       if (!result.records.length) return null;
-      
+
       const record = result.records[0];
       return {
-        ...record.get("c").properties,
-        pais: record.get("pais")
+        id: record.get('id').toNumber(),
+        ...record.get('c').properties,
+        pais: record.get('pais')
       };
     } finally {
       await session.close();
@@ -64,16 +75,17 @@ class Ciudad {
       const result = await session.run(
         `MATCH (c:Ciudad)-[:PERTENECE_A]->(p:Pais)
          WHERE id(c) = $ciudadID
-         RETURN c, id(c) as id, p.nombre as pais`,
+         RETURN c, id(c) AS id, p.nombre AS pais`,
         { ciudadID: neo4j.int(ciudadID) }
       );
+
       if (!result.records.length) return null;
-  
+
       const record = result.records[0];
       return {
         id: record.get('id').toNumber(),
-        ...record.get("c").properties,
-        pais: record.get("pais")
+        ...record.get('c').properties,
+        pais: record.get('pais')
       };
     } finally {
       await session.close();
@@ -86,30 +98,18 @@ class Ciudad {
     try {
       const result = await session.run(
         `MATCH (c:Ciudad {nombre: $nombre})-[:PERTENECE_A]->(p:Pais)
-         RETURN c, p.nombre as pais`,
+         RETURN c, id(c) AS id, p.nombre AS pais`,
         { nombre }
       );
+
       if (!result.records.length) return null;
 
       const record = result.records[0];
       return {
-        ...record.get("c").properties,
-        pais: record.get("pais")
+        id: record.get('id').toNumber(),
+        ...record.get('c').properties,
+        pais: record.get('pais')
       };
-    } finally {
-      await session.close();
-    }
-  }
-
-  // Eliminar ciudad
-  static async delete(nombre) {
-    const session = driver.session();
-    try {
-      await session.run(
-        `MATCH (c:Ciudad {nombre: $nombre}) 
-         DETACH DELETE c`, 
-        { nombre }
-      );
     } finally {
       await session.close();
     }

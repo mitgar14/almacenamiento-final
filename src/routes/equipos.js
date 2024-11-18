@@ -32,7 +32,6 @@ router.get('/deporte/:deporte', [
 router.post('/', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('pais', 'El país es obligatorio').not().isEmpty(),
-    check('categoria', 'La categoría debe ser Femenina, Masculina o Mixta').isIn(['Femenina', 'Masculina', 'Mixta']),
     check('deporte', 'El deporte es obligatorio').not().isEmpty(),
     validarCampos
 ], crearEquipo);

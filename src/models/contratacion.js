@@ -118,41 +118,7 @@ class Contratacion {
     }
   }
 
-  // Crear una nueva contratación
-  static async create({
-    fecha_inicio,
-    fecha_fin,
-    valor_contrato,
-    deportistaID,
-    equipoID,
-  }) {
-    const session = driver.session();
-    try {
-      const result = await session.run(
-        `MATCH (d:Deportista), (e:Equipo) 
-         WHERE id(d) = $deportistaID AND id(e) = $equipoID
-         CREATE (contrato:Contrato {
-           fecha_inicio: date($fecha_inicio),
-           fecha_fin: date($fecha_fin),
-           valor_contrato: $valor_contrato
-         })
-         CREATE (d)-[:TIENE_CONTRATO]->(contrato)
-         CREATE (contrato)-[:CONTRATO_CON]->(e)
-         RETURN d, contrato, e`,
-        { deportistaID, equipoID, fecha_inicio, fecha_fin, valor_contrato }
-      );
-
-      const record = result.records[0];
-      return {
-        deportista: record.get("d").properties,
-        equipo: record.get("e").properties,
-        contrato: record.get("contrato").properties,
-      };
-    } finally {
-      await session.close();
-    }
-  }
-
+  // Obtener un resumen de las contrataciones de un deportista
   static async getResumenByDeportista(deportistaID) {
     const contratos = await this.getByDeportista(deportistaID);
     
@@ -183,6 +149,74 @@ class Contratacion {
         equipos: equiposInfo
       }
     };
+  }
+
+  // Crear una nueva contratación
+  static async create({
+    fecha_inicio,
+    fecha_fin,
+    valor_contrato,
+    deportistaID,
+    equipoID,
+  }) {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `MATCH (d:Deportista), (e:Equipo) 
+         WHERE id(d) = $deportistaID AND id(e) = $equipoID
+         CREATE (contrato:Contrato {
+           fecha_inicio: date($fecha_inicio),
+           fecha_fin: date($fecha_fin),
+           valor_contrato: $valor_contrato
+         })
+         CREATE (d)-[:TIENE_CONTRATO]->(contrato)
+         CREATE (contrato)-[:CONTRATO_CON]->(e)
+         CREATE (d)-[:JUEGA_EN]->(e)
+         RETURN d, contrato, e, id(contrato) AS contratoId`,
+        { 
+          deportistaID: neo4j.int(deportistaID), 
+          equipoID: neo4j.int(equipoID), 
+          fecha_inicio, 
+          fecha_fin, 
+          valor_contrato: neo4j.int(valor_contrato) 
+        }
+      );
+  
+      if (result.records.length === 0) {
+        throw new Error("No se devolvieron registros al crear la contratación.");
+      }
+  
+      const record = result.records[0];
+  
+      const contratoId = record.get('contratoId');
+      const contratoProps = record.get('contrato').properties;
+      const deportistaProps = record.get('d').properties;
+      const equipoProps = record.get('e').properties;
+  
+      if (!contratoId) {
+        throw new Error("No se pudo obtener el ID del contrato creado.");
+      }
+  
+      return {
+        id: contratoId.toNumber(),
+        deportista: {
+          ...deportistaProps,
+          dorsal: deportistaProps.dorsal.toNumber(),
+        },
+        equipo: equipoProps,
+        contrato: {
+          id: contratoId.toNumber(),
+          fecha_inicio: formatDate(contratoProps.fecha_inicio),
+          fecha_fin: formatDate(contratoProps.fecha_fin),
+          valor_contrato: contratoProps.valor_contrato.toNumber(),
+        }
+      };
+    } catch (error) {
+      console.error("Error en Contratacion.create:", error);
+      throw error;
+    } finally {
+      await session.close();
+    }
   }
 
   // Actualizar una contratación

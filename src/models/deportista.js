@@ -108,6 +108,7 @@ class Deportista {
     }
   }
 
+  // Crear un nuevo deportista
   static async create({
     nombre,
     dorsal,
@@ -121,44 +122,50 @@ class Deportista {
     try {
       let ciudadID;
       let paisID;
-  
+
       // Estandarizar los campos
       nombre = standardizeString(nombre);
       posicion = standardizeString(posicion);
       sexo = standardizeString(sexo);
-  
+
       // Procesar el país
       let paisData;
       if (typeof pais === "number" && pais > 0) {
+        // Buscar país por ID
         paisData = await Pais.getByID(pais);
         if (!paisData) {
           throw new Error("País no encontrado");
         }
         paisID = paisData.id;
       } else if (typeof pais === "string") {
+        // Estandarizar nombre del país
         const paisName = standardizeString(pais);
         paisData = await Pais.getByName(paisName);
         if (!paisData) {
-          throw new Error("País no encontrado");
+          // País no encontrado, proceder a crearlo
+          paisData = await Pais.create({ nombre: paisName });
         }
         paisID = paisData.id;
       } else {
         throw new Error("País no válido");
       }
-  
+
       // Procesar la ciudad
       let ciudadData;
       if (typeof ciudad === "number" && ciudad > 0) {
+        // Buscar ciudad por ID
         ciudadData = await Ciudad.getByID(ciudad);
         if (!ciudadData) {
           throw new Error("Ciudad no encontrada");
         }
         ciudadID = ciudadData.id;
       } else if (typeof ciudad === "string") {
+        // Estandarizar nombre de la ciudad
         const ciudadName = standardizeString(ciudad);
         ciudadData = await Ciudad.getByName(ciudadName);
         if (!ciudadData) {
-          if (!paisID || !Number.isInteger(paisID) || paisID <= 0) {
+          // Ciudad no encontrada, proceder a crearla
+          if (!paisID) {
             throw new Error("País no válido para crear la ciudad");
           }
           ciudadData = await Ciudad.create({ nombre: ciudadName, paisID });
@@ -167,20 +174,20 @@ class Deportista {
       } else {
         throw new Error("Ciudad no válida");
       }
-  
-      // Crear el deportista
+
+      // Crear el deportista y sus relaciones
       const result = await session.run(
         `MATCH (c:Ciudad), (p:Pais)
-         WHERE id(c) = $ciudadID AND id(p) = $paisID
-         CREATE (d:Deportista {
-           nombre: $nombre, 
-           dorsal: $dorsal, 
-           posicion: $posicion, 
-           sexo: $sexo
-         })
-         CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
-         CREATE (d)-[:ES_DE]->(p)
-         RETURN d`,
+           WHERE id(c) = $ciudadID AND id(p) = $paisID
+           CREATE (d:Deportista {
+             nombre: $nombre,
+             dorsal: $dorsal,
+             posicion: $posicion,
+             sexo: $sexo
+           })
+           CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
+           CREATE (d)-[:ES_DE]->(p)
+           RETURN d`,
         {
           nombre,
           dorsal: neo4j.int(dorsal),
@@ -191,14 +198,17 @@ class Deportista {
           paisID: neo4j.int(paisID),
         }
       );
-  
+
       if (!result.records.length) {
         throw new Error("Error al crear el deportista");
       }
-  
+
       const deportista = result.records[0].get("d").properties;
       deportista.dorsal = deportista.dorsal.toNumber();
       return deportista;
+    } catch (error) {
+      console.error("Error en Deportista.create:", error);
+      throw error;
     } finally {
       await session.close();
     }

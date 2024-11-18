@@ -1,14 +1,5 @@
 const Equipo = require('../models/equipo');
 
-const crearEquipo = async (req, res) => {
-    try {
-        const equipo = await Equipo.create(req.body);
-        res.status(201).json(equipo);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al crear el equipo', detalle: error.message });
-    }
-};
-
 const obtenerEquipos = async (req, res) => {
     try {
         const equipos = await Equipo.getAllWithRelations();
@@ -35,6 +26,15 @@ const obtenerEquiposPorDeporte = async (req, res) => {
         res.status(200).json(equipos);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los equipos por deporte', detalle: error.message });
+    }
+};
+
+const crearEquipo = async (req, res) => {
+    try {
+        const equipo = await Equipo.create(req.body);
+        res.status(201).json(equipo);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el equipo', detalle: error.message });
     }
 };
 
