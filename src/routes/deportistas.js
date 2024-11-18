@@ -56,8 +56,8 @@ router.put('/:id', [
 ], actualizarDeportista);
 
 // Eliminar un deportista
-router.delete('/', [
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+router.delete('/:id', [
+    check('id', 'El ID es obligatorio').not().isEmpty(),
     check('id').custom(existeDeportistaPorID),
     check('id').custom(noExistenContratacionesPorDeportista),
     validarCampos

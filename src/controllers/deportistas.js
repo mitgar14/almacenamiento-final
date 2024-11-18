@@ -58,9 +58,9 @@ const actualizarDeportista = async (req, res) => {
 };
 
 const eliminarDeportista = async (req, res) => {
-    const { nombre } = req.query;
+    const { id } = req.params;
     try {
-        const resultado = await Deportista.delete(nombre);
+        const resultado = await Deportista.delete(id);
         if (!resultado) {
             return res.status(404).json({ error: 'Deportista no encontrado' });
         }
