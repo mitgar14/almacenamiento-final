@@ -43,6 +43,7 @@ class Contratacion {
       await session.close();
     }
   }
+
   // Obtener todas las contrataciones de un deportista
   static async getByDeportista(deportistaID) {
     const session = driver.session();
@@ -50,21 +51,26 @@ class Contratacion {
       const result = await session.run(
         `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(contrato:Contrato)-[:CONTRATO_CON]->(e:Equipo)
          WHERE id(d) = $deportistaID
-         RETURN contrato, e, id(e) as equipoID`,
-        { deportistaID }
+         RETURN d, contrato, e, id(e) as equipoID`,
+        { deportistaID: neo4j.int(deportistaID) }
       );
-
+  
       const equiposInfo = await Equipo.getAllWithRelations();
-
+  
+      const deportistaInfo = result.records.length > 0 ? {
+        ...result.records[0].get("d").properties,
+        dorsal: result.records[0].get("d").properties.dorsal.toNumber(),
+      } : null;
+  
       const contratos = result.records.map((record) => {
         const contratoProps = record.get("contrato").properties;
         const equipoID = record.get("equipoID").toNumber();
         const equipoBasico = record.get("e").properties;
-
+  
         const equipoCompleto = equiposInfo.find((e) => e.id === equipoID);
-
+  
         const { id, ...equipoSinID } = equipoCompleto || equipoBasico;
-
+  
         return {
           fecha_inicio: formatDate(contratoProps.fecha_inicio),
           fecha_fin: formatDate(contratoProps.fecha_fin),
@@ -72,7 +78,7 @@ class Contratacion {
           equipo: equipoSinID,
         };
       });
-
+  
       const fechaActual = new Date();
       const activos = contratos.filter(
         (c) => new Date(c.fecha_fin) > fechaActual
@@ -80,8 +86,9 @@ class Contratacion {
       const antiguos = contratos.filter(
         (c) => new Date(c.fecha_fin) <= fechaActual
       );
-
+  
       return {
+        deportista: deportistaInfo,
         total_contratos: contratos.length,
         resumen: {
           activos: activos.length,
@@ -95,24 +102,40 @@ class Contratacion {
     }
   }
 
-  // Obtener una contratación específica
-  static async getByDeportistaAndEquipo(deportistaID, equipoID) {
+  // Obtener las contrataciones de un equipo
+  static async getByEquipo(equipoID) {
     const session = driver.session();
     try {
       const result = await session.run(
         `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
-         WHERE id(d) = $deportistaID AND id(e) = $equipoID
-         RETURN d, c, e`,
-        { deportistaID, equipoID }
+         WHERE id(e) = $equipoID
+         MATCH (d)-[:ES_DE]->(p:Pais)
+         MATCH (e)-[:ES_DE]->(pe:Pais)
+         MATCH (e)-[:PRACTICA]->(dep:Deporte)
+         RETURN d, c, e, p.nombre as paisDeportista, pe.nombre as paisEquipo, dep.nombre as deporte`,
+        { equipoID: neo4j.int(equipoID) }
       );
-      const record = result.records[0];
-      if (!record) return null;
-
-      return {
-        deportista: record.get("d").properties,
-        equipo: record.get("e").properties,
-        contrato: record.get("c").properties,
-      };
+  
+      if (!result.records.length) return [];
+  
+      return result.records.map(record => ({
+        deportista: {
+          ...record.get("d").properties,
+          dorsal: record.get("d").properties.dorsal.toNumber(),
+          pais: record.get("paisDeportista")
+        },
+        contrato: {
+          ...record.get("c").properties,
+          fecha_inicio: formatDate(record.get("c").properties.fecha_inicio),
+          fecha_fin: formatDate(record.get("c").properties.fecha_fin),
+          valor_contrato: record.get("c").properties.valor_contrato.toNumber()
+        },
+        equipo: {
+          ...record.get("e").properties,
+          pais: record.get("paisEquipo"),
+          deporte: record.get("deporte")
+        }
+      }));
     } finally {
       await session.close();
     }

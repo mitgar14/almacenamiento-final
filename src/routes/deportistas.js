@@ -2,12 +2,14 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { validarCampos,
     existeDeportistaPorID,
+    existeEquipoPorID,
     noExistenContratacionesPorDeportista,
     existeFechaApropiada } = require('../middlewares');
 
 const {
     obtenerDeportistas,
     obtenerDeportistaPorNombre,
+    obtenerDeportistasPorEquipo,
     obtenerDeportistaPorID,
     crearDeportista,
     actualizarDeportista,
@@ -18,6 +20,13 @@ const router = Router();
 
 // Obtener todos los deportistas
 router.get('/', obtenerDeportistas);
+
+// Obtener deportistas por equipo
+router.get('/equipo/:id', [
+    check('id', 'El ID del equipo es obligatorio').not().isEmpty(),
+    check('id').custom(existeEquipoPorID),
+    validarCampos
+], obtenerDeportistasPorEquipo);
 
 // Obtener deportistas por nombre
 router.get('/buscar', [

@@ -79,6 +79,31 @@ class Deportista {
     }
   }
 
+  // Obtener los deportistas de un equipo
+  static async getByEquipo(idEquipo) {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)
+         WHERE id(e) = $idEquipo
+         RETURN d`,
+        { idEquipo: neo4j.int(idEquipo) }
+      );
+  
+      return result.records.map(record => {
+        const deportista = record.get('d').properties;
+        deportista.id = record.get('d').identity.toNumber();
+        deportista.dorsal = deportista.dorsal.toNumber();
+        return deportista;
+      });
+    } catch (error) {
+      console.error('Error en Deportista.getByEquipo:', error);
+      throw new Error('Error al obtener los deportistas del equipo');
+    } finally {
+      await session.close();
+    }
+  }
+
   // Obtener un deportista por su ID en Neo4j
   static async getByID(deportistaID) {
     const session = driver.session();

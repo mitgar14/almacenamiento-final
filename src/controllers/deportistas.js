@@ -15,22 +15,28 @@ const obtenerDeportistaPorNombre = async (req, res) => {
     const { nombre } = req.query;
     try {
         const deportistas = await Deportista.getByName(nombre);
-        if (deportistas.length === 0) {
-            return res.status(404).json({ error: 'No se encontraron deportistas' });
-        }
         res.status(200).json(deportistas);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los deportistas' });
     }
 };
 
+const obtenerDeportistasPorEquipo = async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const deportistas = await Deportista.getByEquipo(id);
+      res.status(200).json({ equipoID: parseInt(id), deportistas });
+    } catch (error) {
+      console.error('Error en obtenerDeportistasPorEquipo:', error);
+      res.status(500).json({ error: 'Error al obtener los deportistas del equipo', detalle: error.message });
+    }
+  };
+
 const obtenerDeportistaPorID = async (req, res) => {
     const { id } = req.params;
     try {
         const deportista = await Deportista.getByID(id);
-        if (!deportista) {
-            return res.status(404).json({ error: 'Deportista no encontrado' });
-        }
         res.status(200).json(deportista);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener el deportista' });
@@ -51,10 +57,6 @@ const actualizarDeportista = async (req, res) => {
     const campos = req.body;
   
     try {
-      // Verificar que se proporcionan campos para actualizar
-      if (Object.keys(campos).length === 0) {
-        return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
-      }
   
       // Construir la cláusula SET y los parámetros
       const actualizaciones = [];
@@ -109,6 +111,7 @@ module.exports = {
     crearDeportista,
     obtenerDeportistas,
     obtenerDeportistaPorNombre,
+    obtenerDeportistasPorEquipo,
     obtenerDeportistaPorID,
     actualizarDeportista,
     eliminarDeportista

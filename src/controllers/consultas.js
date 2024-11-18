@@ -1,44 +1,24 @@
 const neo4j = require('neo4j-driver');
 const Consultas = require('../models/consultas');
 
-const realizarConsulta = async (req, res, consulta, params = {}) => {
-    try {
-        const resultado = await consulta(params);
-        res.status(200).json(resultado);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al realizar la consulta', detalle: error.message });
-    }
-};
+const realizarConsulta = require("../helpers/consultas");
 
 // Consultas principales
-const consultarDeportistasConContratosDesde = async (req, res) => {
-    try {
-      const { fecha } = req.query;
-      
-      if (!fecha) {
-        return res.status(400).json({
-          error: "Fecha requerida",
-          detalle: "Debe proporcionar una fecha en formato YYYY-MM-DD"
-        });
-      }
-  
-      const resultado = await Consultas.deportistasConContratosDesde(fecha);
-      
-      if (resultado.length === 0) {
-        return res.status(404).json({
-          mensaje: "No se encontraron contratos desde la fecha especificada"
-        });
-      }
-  
-      res.status(200).json(resultado);
-  
-    } catch (error) {
-      res.status(500).json({
-        error: "Error al realizar la consulta",
-        detalle: error.message
+const consultarDeportistasConContratosDesde = (req, res) => {
+  const { fecha } = req.query;
+
+  realizarConsulta(req, res, async () => {
+    const resultado = await Consultas.deportistasConContratosDesde(fecha);
+
+    if (resultado.length === 0) {
+      return res.status(404).json({
+        mensaje: "No se encontraron contratos desde la fecha especificada"
       });
     }
-  };
+
+    return res.status(200).json(resultado);
+  });
+};
 
 const consultarDeportistasMasculinosEnFutbolEspana = (req, res) =>
     realizarConsulta(req, res, Consultas.deportistasMasculinosEnEquiposFutbolEspana);
@@ -53,8 +33,8 @@ const consultarCantidadDeportistasPorEquipo = (req, res) =>
     realizarConsulta(req, res, Consultas.cantidadDeportistasPorEquipo);
 
 // Consultas adicionales
-const consultarEquiposConMasDe3Deportistas = (req, res) =>
-    realizarConsulta(req, res, Consultas.equiposConMasDe3Deportistas);
+const consultarNacionalidadDeportistasPorEquipo = (req, res) =>
+  realizarConsulta(req, res, Consultas.nacionalidadDeportistasPorEquipo);
 
 const consultarCantidadDeportistasPorDeporteMinimo1 = (req, res) =>
     realizarConsulta(req, res, Consultas.cantidadDeportistasPorDeporteMinimo1);
@@ -74,7 +54,7 @@ module.exports = {
     consultarDeportistasDeEspanaEnEquiposEspana,
     consultarDeportistasConContratosAltos,
     consultarCantidadDeportistasPorEquipo,
-    consultarEquiposConMasDe3Deportistas,
+    consultarNacionalidadDeportistasPorEquipo,
     consultarCantidadDeportistasPorDeporteMinimo1,
     consultarContratosTerminandoEn6Meses,
     consultarEquiposConContratosActivos,

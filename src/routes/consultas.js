@@ -7,7 +7,7 @@ const {
     consultarDeportistasDeEspanaEnEquiposEspana,
     consultarDeportistasConContratosAltos,
     consultarCantidadDeportistasPorEquipo,
-    consultarEquiposConMasDe3Deportistas,
+    consultarNacionalidadDeportistasPorEquipo,
     consultarCantidadDeportistasPorDeporteMinimo1,
     consultarContratosTerminandoEn6Meses,
     consultarEquiposConContratosActivos,
@@ -32,7 +32,7 @@ router.get('/deportistas-espana-equipos-espana', consultarDeportistasDeEspanaEnE
 router.get('/contratos-altos', consultarDeportistasConContratosAltos);
 router.get('/deportistas-por-equipo', consultarCantidadDeportistasPorEquipo);
 
-router.get('/equipos-mas-3-deportistas', consultarEquiposConMasDe3Deportistas);
+router.get("/nacionalidad-deportistas-por-equipo", consultarNacionalidadDeportistasPorEquipo);
 router.get('/deportistas-por-deporte-minimo-1', consultarCantidadDeportistasPorDeporteMinimo1);
 router.get('/contratos-terminan-en-6-meses', consultarContratosTerminandoEn6Meses);
 router.get('/equipos-contratos-activos', consultarEquiposConContratosActivos);

@@ -31,20 +31,53 @@ class Equipo {
     }
   }
 
+  // Obtener un equipo por su ID
+  static async getByID(id) {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `MATCH (e:Equipo)
+           WHERE id(e) = $id
+           MATCH (e)-[:ES_DE]->(p:Pais)
+           OPTIONAL MATCH (e)-[:PRACTICA]->(d:Deporte)
+           RETURN e, p.nombre AS pais, COALESCE(d.nombre, "Sin deporte") AS deporte`,
+        { id: neo4j.int(id) }
+      );
+
+      if (result.records.length === 0) {
+        return null;
+      }
+
+      const record = result.records[0];
+      return {
+        id: record.get("e").identity.toNumber(),
+        ...record.get("e").properties,
+        pais: record.get("pais"),
+        deporte: record.get("deporte"),
+      };
+    } catch (error) {
+      console.error("Error en Equipo.getByID:", error);
+      throw new Error("Error al obtener el equipo por ID.");
+    } finally {
+      await session.close();
+    }
+  }
+
   // Obtener los equipos con sus relaciones por pais
   static async getByPais(pais) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (e:Equipo)-[:ES_DE]->(p:Pais {nombre: $pais})
-                 MATCH (e)-[:PRACTICA]->(d:Deporte)
-                 RETURN e, d.nombre AS deporte`,
+        `MATCH (e:Equipo)-[:ES_DE]->(p:Pais)
+         WHERE toUpper(p.nombre) = toUpper($pais)
+         MATCH (e)-[:PRACTICA]->(d:Deporte)
+         RETURN e, d.nombre AS deporte, p.nombre AS paisNombre`,
         { pais }
       );
       return result.records.map((record) => ({
         ...record.get("e").properties,
         deporte: record.get("deporte"),
-        pais,
+        pais: record.get("paisNombre"),
       }));
     } finally {
       await session.close();

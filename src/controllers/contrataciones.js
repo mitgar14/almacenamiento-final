@@ -1,18 +1,6 @@
 const neo4j = require("neo4j-driver");
 const Contratacion = require("../models/contratacion");
 
-const crearContratacion = async (req, res) => {
-  try {
-    const contratacion = await Contratacion.create(req.body);
-    res.status(201).json(contratacion);
-  } catch (error) {
-    res.status(500).json({
-      error: "Error al crear la contratación",
-      detalle: error.message,
-    });
-  }
-};
-
 const obtenerContrataciones = async (req, res) => {
   try {
     const contrataciones = await Contratacion.getAll();
@@ -38,19 +26,29 @@ const obtenerContratacionPorDeportista = async (req, res) => {
   }
 };
 
-const obtenerContratacionPorDeportistaYEquipo = async (req, res) => {
-  const { deportistaID, equipoID } = req.params;
+const obtenerContratacionPorEquipo = async (req, res) => {
+  const { equipoID } = req.params;
   try {
-    const contratacion = await Contratacion.getByDeportistaAndEquipo(
-      deportistaID,
+    const contratacion = await Contratacion.getByEquipo(
       equipoID
     );
-    if (!contratacion)
-      return res.status(404).json({ error: "Contratación no encontrada" });
+
     res.status(200).json(contratacion);
   } catch (error) {
     res.status(500).json({
       error: "Error al obtener la contratación",
+      detalle: error.message,
+    });
+  }
+};
+
+const crearContratacion = async (req, res) => {
+  try {
+    const contratacion = await Contratacion.create(req.body);
+    res.status(201).json(contratacion);
+  } catch (error) {
+    res.status(500).json({
+      error: "Error al crear la contratación",
       detalle: error.message,
     });
   }
@@ -67,7 +65,8 @@ const actualizarContratacion = async (req, res) => {
     if (clave === "contratoID") continue;
 
     if (clave === "fecha_inicio" || clave === "fecha_fin") {
-      parametros[clave] = neo4j.types.Date.fromStandardDate(new Date(valor));
+      const [year, month, day] = valor.split("-").map(Number);
+      parametros[clave] = new neo4j.types.Date(year, month, day);
     } else if (clave === "valor_contrato") {
       parametros[clave] = neo4j.int(valor);
     } else {
@@ -85,8 +84,6 @@ const actualizarContratacion = async (req, res) => {
       setClause,
       parametros
     );
-    if (!contratacionActualizada)
-      return res.status(404).json({ error: "Contratación no encontrada" });
     res.status(200).json(contratacionActualizada);
   } catch (error) {
     res.status(500).json({
@@ -100,9 +97,6 @@ const eliminarContratacion = async (req, res) => {
   const { contratoID } = req.params;
   try {
     const resultado = await Contratacion.delete(contratoID);
-    if (!resultado) {
-      return res.status(404).json({ error: "Contratación no encontrada" });
-    }
     res.status(200).json({ message: "Contratación eliminada exitosamente" });
   } catch (error) {
     res.status(500).json({
@@ -116,7 +110,7 @@ module.exports = {
   crearContratacion,
   obtenerContrataciones,
   obtenerContratacionPorDeportista,
-  obtenerContratacionPorDeportistaYEquipo,
+  obtenerContratacionPorEquipo,
   actualizarContratacion,
   eliminarContratacion,
 };

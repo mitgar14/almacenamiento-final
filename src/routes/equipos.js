@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const {
     crearEquipo,
     obtenerEquipos,
+    obtenerEquipoPorID,
     obtenerEquiposPorPais,
     obtenerEquiposPorDeporte,
     actualizarEquipo,
@@ -10,6 +11,7 @@ const {
 } = require('../controllers/equipos');
 
 const { validarCampos,
+    existeEquipoPorID,
     noExistenDeportistasPorEquipo,
     noExistenContratacionesPorEquipo
  } = require('../middlewares');
@@ -20,16 +22,24 @@ const router = Router();
 router.get('/', obtenerEquipos);
 
 // Obtener equipos por país
-router.get('/pais/:pais', [
+router.get('/pais', [
     check('pais', 'El país es obligatorio').not().isEmpty(),
     validarCampos
 ], obtenerEquiposPorPais);
 
 // Obtener equipos por deporte
-router.get('/deporte/:deporte', [
+router.get('/deporte', [
     check('deporte', 'El deporte es obligatorio').not().isEmpty(),
     validarCampos
 ], obtenerEquiposPorDeporte);
+
+// Obtener un equipo por ID
+router.get('/:id', [
+    check('id', "El ID es obligatorio").not().isEmpty(),
+    check('id', 'No es un ID válido').isInt(),
+    check('id').custom(existeEquipoPorID),
+    validarCampos
+], obtenerEquipoPorID);
 
 // Crear un nuevo equipo
 router.post('/', [
@@ -41,14 +51,17 @@ router.post('/', [
 
 // Actualizar un equipo existente
 router.put('/:id', [
+    check('id', "El ID es obligatorio").not().isEmpty(),
     check('id', 'No es un ID válido').isInt(),
-    check('categoria', 'La categoría debe ser Femenina, Masculina o Mixta').optional().isIn(['Femenina', 'Masculina', 'Mixta']),
+    check('id').custom(existeEquipoPorID),
     validarCampos
 ], actualizarEquipo);
 
 // Eliminar un equipo por ID
 router.delete('/:id', [
+    check('id', "El ID es obligatorio").not().isEmpty(),
     check('id', 'No es un ID válido').isInt(),
+    check('id').custom(existeEquipoPorID),
     check('id').custom(noExistenDeportistasPorEquipo),
     check('id').custom(noExistenContratacionesPorEquipo),
     validarCampos
