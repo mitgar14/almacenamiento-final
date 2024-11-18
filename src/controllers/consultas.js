@@ -1,3 +1,4 @@
+const neo4j = require('neo4j-driver');
 const Consultas = require('../models/consultas');
 
 const realizarConsulta = async (req, res, consulta, params = {}) => {
@@ -10,8 +11,34 @@ const realizarConsulta = async (req, res, consulta, params = {}) => {
 };
 
 // Consultas principales
-const consultarDeportistasConContratosDesde = (req, res) =>
-    realizarConsulta(req, res, Consultas.deportistasConContratosDesde, { fecha: req.query.fecha });
+const consultarDeportistasConContratosDesde = async (req, res) => {
+    try {
+      const { fecha } = req.query;
+      
+      if (!fecha) {
+        return res.status(400).json({
+          error: "Fecha requerida",
+          detalle: "Debe proporcionar una fecha en formato YYYY-MM-DD"
+        });
+      }
+  
+      const resultado = await Consultas.deportistasConContratosDesde(fecha);
+      
+      if (resultado.length === 0) {
+        return res.status(404).json({
+          mensaje: "No se encontraron contratos desde la fecha especificada"
+        });
+      }
+  
+      res.status(200).json(resultado);
+  
+    } catch (error) {
+      res.status(500).json({
+        error: "Error al realizar la consulta",
+        detalle: error.message
+      });
+    }
+  };
 
 const consultarDeportistasMasculinosEnFutbolEspana = (req, res) =>
     realizarConsulta(req, res, Consultas.deportistasMasculinosEnEquiposFutbolEspana);

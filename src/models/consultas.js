@@ -1,22 +1,39 @@
 const neo4j = require("neo4j-driver");
 const driver = require("../database/Neo4jConnection").driver;
+const formatDate = require("../helpers/date");
 
 class Consultas {
   // Consulta 1: Deportistas con contratos a partir de una fecha específica
-  static async deportistasConContratosDesde(fecha) {
+  static async deportistasConContratosDesde(fechaInput) {
     const session = driver.session();
     try {
+      // Convertir y limpiar la entrada
+      const fechaStr = fechaInput.toString().trim().replace(/['"]+/g, "");
+
+      // Realizar la consulta
       const result = await session.run(
-        `MATCH (d:Deportista)-[c:CONTRATADO]->(e:Equipo)
-                 WHERE c.fecha_contratacion >= $fecha
-                 RETURN d, c, e`,
-        { fecha }
+        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+         WHERE date(c.fecha_inicio) >= date($fecha)
+         RETURN d, c, e
+         ORDER BY c.fecha_inicio`,
+        { fecha: fechaStr }
       );
+
       return result.records.map((record) => ({
-        deportista: record.get("d").properties,
-        contrato: record.get("c").properties,
+        deportista: {
+          ...record.get("d").properties,
+          dorsal: record.get("d").properties.dorsal.toNumber(),
+        },
+        contrato: {
+          ...record.get("c").properties,
+          fecha_inicio: formatDate(record.get("c").properties.fecha_inicio),
+          fecha_fin: formatDate(record.get("c").properties.fecha_fin),
+          valor_contrato: record.get("c").properties.valor_contrato.toNumber(),
+        },
         equipo: record.get("e").properties,
       }));
+    } catch (error) {
+      throw new Error(`Error en la consulta: ${error.message}`);
     } finally {
       await session.close();
     }
@@ -27,9 +44,9 @@ class Consultas {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista {sexo: 'MASCULINO'})-[:PERTENECE_A]->(e:Equipo)-[:ES_DE]->(p:Pais {nombre: 'España'})
-                 WHERE e.deporte = 'FUTBOL'
-                 RETURN d, e, p`
+        `MATCH (d:Deportista {sexo: 'MASCULINO'})-[:JUEGA_EN]->(e:Equipo)-[:ES_DE]->(p:Pais {nombre: 'ESPAÑA'})
+         MATCH (e)-[:PRACTICA]->(dep:Deporte {nombre: 'FUTBOL'})
+         RETURN d, e, p`
       );
       return result.records.map((record) => ({
         deportista: record.get("d").properties,
@@ -41,13 +58,14 @@ class Consultas {
     }
   }
 
-  // Consulta 3: Deportistas de España en equipos de España
+  // Consulta 3: Deportistas españoles en equipos españoles
   static async deportistasDeEspanaEnEquiposEspana() {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista {nacionalidad: 'España'})-[:PERTENECE_A]->(e:Equipo)-[:ES_DE]->(p:Pais {nombre: 'España'})
-                 RETURN d, e, p`
+        `MATCH (d:Deportista)-[:ES_DE]->(p1:Pais {nombre: 'ESPAÑA'})
+         MATCH (d)-[:JUEGA_EN]->(e:Equipo)-[:ES_DE]->(p2:Pais {nombre: 'ESPAÑA'})
+         RETURN d, e, p1 as p`
       );
       return result.records.map((record) => ({
         deportista: record.get("d").properties,
@@ -59,18 +77,26 @@ class Consultas {
     }
   }
 
-  // Consulta 4: Deportistas con contratos superiores a USD 1,000,000
+  // Consulta 4: Deportistas con contratos superiores a 1,000,000
   static async deportistasConContratosAltos() {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[c:CONTRATADO]->(e:Equipo)
-                 WHERE c.valor > 1000000
-                 RETURN d, c, e`
+        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+         WHERE c.valor_contrato > 1000000
+         RETURN d, c, e`
       );
       return result.records.map((record) => ({
-        deportista: record.get("d").properties,
-        contrato: record.get("c").properties,
+        deportista: {
+          ...record.get("d").properties,
+          dorsal: record.get("d").properties.dorsal.toNumber(),
+        },
+        contrato: {
+          ...record.get("c").properties,
+          fecha_inicio: formatDate(record.get("c").properties.fecha_inicio),
+          fecha_fin: formatDate(record.get("c").properties.fecha_fin),
+          valor_contrato: record.get("c").properties.valor_contrato.toNumber(),
+        },
         equipo: record.get("e").properties,
       }));
     } finally {
@@ -83,8 +109,8 @@ class Consultas {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:PERTENECE_A]->(e:Equipo)
-                 RETURN e.nombre AS equipo, count(d) AS cantidad`
+        `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)
+         RETURN e.nombre AS equipo, count(d) AS cantidad`
       );
       return result.records.map((record) => ({
         equipo: record.get("equipo"),
@@ -100,10 +126,10 @@ class Consultas {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:PERTENECE_A]->(e:Equipo)
-                 WITH e, count(d) AS cantidad
-                 WHERE cantidad > 3
-                 RETURN e, cantidad`
+        `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)
+         WITH e, count(d) AS cantidad
+         WHERE cantidad > 3
+         RETURN e, cantidad`
       );
       return result.records.map((record) => ({
         equipo: record.get("e").properties,
@@ -114,15 +140,15 @@ class Consultas {
     }
   }
 
-  // Consulta adicional 2: Deportistas por cada deporte, mínimo 1 deportista por deporte
+  // Consulta adicional 2: Deportistas por cada deporte
   static async cantidadDeportistasPorDeporteMinimo1() {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:PERTENECE_A]->(e:Equipo)-[:PRACTICA]->(dep:Deporte)
-                 WITH dep, count(d) AS cantidad
-                 WHERE cantidad >= 1
-                 RETURN dep.nombre AS deporte, cantidad`
+        `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)-[:PRACTICA]->(dep:Deporte)
+         WITH dep, count(d) AS cantidad
+         WHERE cantidad >= 1
+         RETURN dep.nombre AS deporte, cantidad`
       );
       return result.records.map((record) => ({
         deporte: record.get("deporte"),
@@ -143,9 +169,9 @@ class Consultas {
 
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[c:CONTRATADO]->(e:Equipo)
-                 WHERE c.fecha_finalizacion <= $formattedDate
-                 RETURN d, c, e`,
+        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+         WHERE c.fecha_fin <= $formattedDate
+         RETURN d, c, e`,
         { formattedDate }
       );
       return result.records.map((record) => ({
@@ -160,37 +186,54 @@ class Consultas {
 
   // Consulta adicional 4: Equipos con al menos un contrato activo
   static async equiposConContratosActivos() {
-    const session = driver.session();
-    const currentDate = new Date().toISOString().split("T")[0];
-
-    try {
-      const result = await session.run(
-        `MATCH (d:Deportista)-[c:CONTRATADO]->(e:Equipo)
-                 WHERE c.fecha_finalizacion >= $currentDate
-                 RETURN e, count(c) AS contratosActivos`,
-        { currentDate }
-      );
-      return result.records.map((record) => ({
-        equipo: record.get("e").properties,
-        contratosActivos: record.get("contratosActivos").toInt(),
-      }));
-    } finally {
-      await session.close();
-    }
+      const session = driver.session();
+      const currentDate = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+      
+      try {
+          const result = await session.run(
+              `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+               WHERE date(c.fecha_fin) >= date($currentDate)
+               WITH e, COUNT(c) as contratosActivos
+               RETURN e, contratosActivos
+               ORDER BY contratosActivos DESC`,
+              { currentDate }
+          );
+  
+          return result.records.map(record => ({
+              equipo: {
+                  ...record.get('e').properties
+              },
+              contratosActivos: record.get('contratosActivos').toNumber()
+          }));
+  
+      } catch (error) {
+          console.error('Error en equiposConContratosActivos:', error);
+          throw new Error(`Error al consultar equipos con contratos activos: ${error.message}`);
+      } finally {
+          await session.close();
+      }
   }
 
-  // Nueva Consulta adicional 5: Deportistas con contratos de duración superior a 3 años
+  // Consulta adicional 5: Deportistas con contratos de duración superior a 3 años
   static async deportistasConContratosLargos() {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[c:CONTRATADO]->(e:Equipo)
-                 WHERE datetime(c.fecha_finalizacion).year - datetime(c.fecha_contratacion).year >= 3
-                 RETURN d, c, e`
+        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
+         WHERE duration.between(date(c.fecha_inicio), date(c.fecha_fin)).years >= 3
+         RETURN d, c, e`
       );
       return result.records.map((record) => ({
-        deportista: record.get("d").properties,
-        contrato: record.get("c").properties,
+        deportista: {
+          ...record.get("d").properties,
+          dorsal: record.get("d").properties.dorsal.toNumber(),
+        },
+        contrato: {
+          ...record.get("c").properties,
+          fecha_inicio: formatDate(record.get("c").properties.fecha_inicio),
+          fecha_fin: formatDate(record.get("c").properties.fecha_fin),
+          valor_contrato: record.get("c").properties.valor_contrato.toNumber(),
+        },
         equipo: record.get("e").properties,
       }));
     } finally {
