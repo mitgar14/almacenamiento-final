@@ -49,7 +49,10 @@ class Consultas {
          RETURN d, e, p`
       );
       return result.records.map((record) => ({
-        deportista: record.get("d").properties,
+        deportista: {
+          ...record.get("d").properties,
+          dorsal: record.get("d").properties.dorsal.toNumber()
+        },
         equipo: record.get("e").properties,
         pais: record.get("p").properties,
       }));
