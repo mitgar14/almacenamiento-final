@@ -188,12 +188,15 @@ class Deportista {
   }
 
   // Eliminar un deportista
-  static async delete(nombre) {
+  static async delete(id) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista {nombre: $nombre}) DETACH DELETE d RETURN count(d) AS eliminado`,
-        { nombre }
+        `MATCH (d:Deportista) 
+         WHERE id(d) = $id 
+         DETACH DELETE d 
+         RETURN count(d) AS eliminado`,
+        { id: neo4j.int(id) }
       );
       return result.records[0].get("eliminado").toInt() > 0;
     } finally {
