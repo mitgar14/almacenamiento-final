@@ -18,6 +18,16 @@ const obtenerContrataciones = async (req, res) => {
     }
 };
 
+const obtenerContratacionPorDeportista = async (req, res) => {
+    const { deportistaID } = req.params;
+    try {
+        const contrataciones = await Contratacion.getByDeportista(deportistaID);
+        res.status(200).json(contrataciones);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener las contrataciones', detalle: error.message });
+    }
+};
+
 const obtenerContratacionPorDeportistaYEquipo = async (req, res) => {
     const { deportistaID, equipoID } = req.params;
     try {
@@ -41,10 +51,12 @@ const actualizarContratacion = async (req, res) => {
 };
 
 const eliminarContratacion = async (req, res) => {
-    const { deportistaID, equipoID } = req.params;
+    const { contratoID } = req.params;
     try {
-        const resultado = await Contratacion.delete(deportistaID, equipoID);
-        if (!resultado) return res.status(404).json({ error: 'Contratación no encontrada' });
+        const resultado = await Contratacion.delete(contratoID);
+        if (!resultado) {
+            return res.status(404).json({ error: 'Contratación no encontrada' });
+        }
         res.status(200).json({ message: 'Contratación eliminada exitosamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar la contratación', detalle: error.message });
@@ -54,6 +66,7 @@ const eliminarContratacion = async (req, res) => {
 module.exports = {
     crearContratacion,
     obtenerContrataciones,
+    obtenerContratacionPorDeportista,
     obtenerContratacionPorDeportistaYEquipo,
     actualizarContratacion,
     eliminarContratacion

@@ -40,13 +40,17 @@ class Deportista {
     }
   }
 
-  // Obtener un deportista por similitud de nombre
+  // Obtener deportistas por nombre estandarizado
   static async getByName(nombre) {
     const session = driver.session();
     try {
+      const nombreEstandarizado = standardizeString(nombre);
+
       const result = await session.run(
-        `MATCH (d:Deportista) WHERE d.nombre CONTAINS $nombre RETURN d`,
-        { nombre }
+        `MATCH (d:Deportista) 
+           WHERE toLower(d.nombre) CONTAINS toLower($nombre) 
+           RETURN d`,
+        { nombre: nombreEstandarizado }
       );
 
       const deportistas = await Promise.all(
@@ -109,71 +113,17 @@ class Deportista {
   }
 
   // Crear un nuevo deportista
-  static async create({
-    nombre,
-    dorsal,
-    posicion,
-    sexo,
-    fecha_nacimiento,
-    ciudad,
-    pais,
-  }) {
+  static async create(datos) {
     const session = driver.session();
     try {
-      let ciudadID;
-      let paisID;
-
       // Estandarizar los campos
-      nombre = standardizeString(nombre);
-      posicion = standardizeString(posicion);
-      sexo = standardizeString(sexo);
+      datos.nombre = standardizeString(datos.nombre);
+      datos.posicion = standardizeString(datos.posicion);
+      datos.sexo = standardizeString(datos.sexo);
 
-      // Procesar el país
-      let paisData;
-      if (typeof pais === "number" && pais > 0) {
-        // Buscar país por ID
-        paisData = await Pais.getByID(pais);
-        if (!paisData) {
-          throw new Error("País no encontrado");
-        }
-        paisID = paisData.id;
-      } else if (typeof pais === "string") {
-        // Estandarizar nombre del país
-        const paisName = standardizeString(pais);
-        paisData = await Pais.getByName(paisName);
-        if (!paisData) {
-          // País no encontrado, proceder a crearlo
-          paisData = await Pais.create({ nombre: paisName });
-        }
-        paisID = paisData.id;
-      } else {
-        throw new Error("País no válido");
-      }
-
-      // Procesar la ciudad
-      let ciudadData;
-      if (typeof ciudad === "number" && ciudad > 0) {
-        // Buscar ciudad por ID
-        ciudadData = await Ciudad.getByID(ciudad);
-        if (!ciudadData) {
-          throw new Error("Ciudad no encontrada");
-        }
-        ciudadID = ciudadData.id;
-      } else if (typeof ciudad === "string") {
-        // Estandarizar nombre de la ciudad
-        const ciudadName = standardizeString(ciudad);
-        ciudadData = await Ciudad.getByName(ciudadName);
-        if (!ciudadData) {
-          // Ciudad no encontrada, proceder a crearla
-          if (!paisID) {
-            throw new Error("País no válido para crear la ciudad");
-          }
-          ciudadData = await Ciudad.create({ nombre: ciudadName, paisID });
-        }
-        ciudadID = ciudadData.id;
-      } else {
-        throw new Error("Ciudad no válida");
-      }
+      // Procesar el país y la ciudad
+      const paisID = await Pais.getOrCreatePais(datos.pais);
+      const ciudadID = await Ciudad.getOrCreateCiudad(datos.ciudad, paisID);
 
       // Crear el deportista y sus relaciones
       const result = await session.run(

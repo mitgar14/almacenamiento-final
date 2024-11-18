@@ -4,6 +4,25 @@ const neo4j = require('neo4j-driver');
 const driver = require('../database/Neo4jConnection').driver;
 
 class Ciudad {
+  // Obtener o crear una ciudad (para Deportistas)
+  static async getOrCreateCiudad(ciudad, paisID) {
+    if (typeof ciudad === "number" && ciudad > 0) {
+      const ciudadData = await this.getByID(ciudad);
+      if (!ciudadData) throw new Error("Ciudad no encontrada");
+      return ciudadData.id;
+    } else if (typeof ciudad === "string") {
+      const ciudadName = standardizeString(ciudad);
+      let ciudadData = await this.getByName(ciudadName);
+      if (!ciudadData) {
+        if (!paisID) throw new Error("País no válido para crear la ciudad");
+        ciudadData = await this.create({ nombre: ciudadName, paisID });
+      }
+      return ciudadData.id;
+    } else {
+      throw new Error("Ciudad no válida");
+    }
+  }
+
   // Crear una nueva ciudad
   static async create({ nombre, paisID }) {
     const session = driver.session();

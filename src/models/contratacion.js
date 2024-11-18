@@ -193,10 +193,6 @@ class Contratacion {
       const deportistaProps = record.get('d').properties;
       const equipoProps = record.get('e').properties;
   
-      if (!contratoId) {
-        throw new Error("No se pudo obtener el ID del contrato creado.");
-      }
-  
       return {
         id: contratoId.toNumber(),
         deportista: {
@@ -250,16 +246,16 @@ class Contratacion {
     }
   }
 
-  // Eliminar una contratación
-  static async delete(deportistaID, equipoID) {
+  // Eliminar una contratación por su ID
+  static async delete(contratoID) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
-         WHERE id(d) = $deportistaID AND id(e) = $equipoID
+        `MATCH (c:Contrato) 
+         WHERE id(c) = $contratoID
          DETACH DELETE c
          RETURN count(c) AS eliminado`,
-        { deportistaID, equipoID }
+        { contratoID: neo4j.int(contratoID) }
       );
       return result.records[0].get("eliminado").toInt() > 0;
     } finally {
