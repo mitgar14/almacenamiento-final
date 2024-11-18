@@ -9,7 +9,10 @@ const {
     eliminarEquipo
 } = require('../controllers/equipos');
 
-const { validarCampos } = require('../middlewares');
+const { validarCampos,
+    noExistenDeportistasPorEquipo,
+    noExistenContratacionesPorEquipo
+ } = require('../middlewares');
 
 const router = Router();
 
@@ -46,6 +49,8 @@ router.put('/:id', [
 // Eliminar un equipo por ID
 router.delete('/:id', [
     check('id', 'No es un ID válido').isInt(),
+    check('id').custom(noExistenDeportistasPorEquipo),
+    check('id').custom(noExistenContratacionesPorEquipo),
     validarCampos
 ], eliminarEquipo);
 

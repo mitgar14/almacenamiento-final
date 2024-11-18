@@ -8,28 +8,28 @@ const standardizeString = require("../helpers/string");
 class Equipo {
   // Obtener todos los equipos con sus relaciones
   static async getAllWithRelations() {
-      const session = driver.session();
-      try {
-        const result = await session.run(
-          `MATCH (e:Equipo)-[:ES_DE]->(p:Pais)
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `MATCH (e:Equipo)-[:ES_DE]->(p:Pais)
            OPTIONAL MATCH (e)-[:PRACTICA]->(d:Deporte)
            OPTIONAL MATCH (e)<-[:JUEGA_EN]-(dep:Deportista)
            WITH e, p, d, collect(dep) as deportistas
            RETURN id(e) as id, e, p.nombre AS pais, 
                   COALESCE(d.nombre, "Sin deporte") AS deporte, 
                   size(deportistas) as num_deportistas`
-        );
-        return result.records.map((record) => ({
-          id: record.get("id").toNumber(),
-          ...record.get("e").properties,
-          pais: record.get("pais"),
-          deporte: record.get("deporte"),
-          num_deportistas: record.get("num_deportistas").toNumber(),
-        }));
-      } finally {
-        await session.close();
-      }
+      );
+      return result.records.map((record) => ({
+        id: record.get("id").toNumber(),
+        ...record.get("e").properties,
+        pais: record.get("pais"),
+        deporte: record.get("deporte"),
+        num_deportistas: record.get("num_deportistas").toNumber(),
+      }));
+    } finally {
+      await session.close();
     }
+  }
 
   // Obtener los equipos con sus relaciones por pais
   static async getByPais(pais) {
@@ -107,7 +107,7 @@ class Equipo {
         {
           nombre: nombreEstandarizado,
           pais: paisEstandarizado,
-          deporte: deporteEstandarizado
+          deporte: deporteEstandarizado,
         }
       );
 
@@ -144,22 +144,25 @@ class Equipo {
   static async update(id, { nombre }) {
     const session = driver.session();
     try {
+      const nombreEstandarizado = standardizeString(nombre);
+
       const result = await session.run(
         `MATCH (e:Equipo) WHERE id(e) = $id
-                 SET e.nombre = $nombre
-                 WITH e
-                 MATCH (e)-[:ES_DE]->(p:Pais), (e)-[:PRACTICA]->(d:Deporte)
-                 RETURN e, p.nombre AS pais, d.nombre AS deporte`,
-        { id: neo4j.int(id), nombre }
+         SET e.nombre = $nombre
+         RETURN e`,
+        { id: neo4j.int(id), nombre: nombreEstandarizado }
       );
+
       const record = result.records[0];
       return record
         ? {
             ...record.get("e").properties,
-            pais: record.get("pais"),
-            deporte: record.get("deporte"),
+            id: record.get("e").identity.toNumber(),
           }
         : null;
+    } catch (error) {
+      console.error("Error en Equipo.update:", error);
+      throw error;
     } finally {
       await session.close();
     }
@@ -168,24 +171,6 @@ class Equipo {
   static async delete(id) {
     const session = driver.session();
     try {
-      // Primero verificamos si hay contratos o jugadores asociados
-      const result = await session.run(
-        `MATCH (e:Equipo) WHERE id(e) = $id
-                 OPTIONAL MATCH (e)<-[:JUEGA_EN]-(d:Deportista)
-                 OPTIONAL MATCH (e)<-[:CONTRATO_CON]-(c:Contrato)
-                 RETURN count(d) as deportistas, count(c) as contratos`,
-        { id: neo4j.int(id) }
-      );
-
-      const deportistas = result.records[0].get("deportistas").toNumber();
-      const contratos = result.records[0].get("contratos").toNumber();
-
-      if (deportistas > 0 || contratos > 0) {
-        throw new Error(
-          "No se puede eliminar el equipo porque tiene deportistas o contratos asociados"
-        );
-      }
-
       await session.run(
         `MATCH (e:Equipo) WHERE id(e) = $id
                  DETACH DELETE e`,

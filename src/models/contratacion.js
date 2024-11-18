@@ -121,33 +121,33 @@ class Contratacion {
   // Obtener un resumen de las contrataciones de un deportista
   static async getResumenByDeportista(deportistaID) {
     const contratos = await this.getByDeportista(deportistaID);
-    
+
     const todosLosContratos = [...contratos.activos, ...contratos.antiguos];
-    const equiposInfo = todosLosContratos.map(contrato => {
+    const equiposInfo = todosLosContratos.map((contrato) => {
       const esActivo = contratos.activos.some(
-        c => c.equipo.nombre === contrato.equipo.nombre
+        (c) => c.equipo.nombre === contrato.equipo.nombre
       );
-  
+
       const añoInicio = new Date(contrato.fecha_inicio).getFullYear();
       const añoFin = new Date(contrato.fecha_fin).getFullYear();
-      
-      const estado = esActivo 
+
+      const estado = esActivo
         ? `Equipo actual (${añoInicio}-${añoFin})`
         : `Equipo antiguo (${añoInicio}-${añoFin})`;
-  
+
       return {
         nombre: contrato.equipo.nombre,
         pais: contrato.equipo.pais,
-        estado
+        estado,
       };
     });
-  
+
     return {
       total_contratos: contratos.total_contratos,
       resumen: {
         ...contratos.resumen,
-        equipos: equiposInfo
-      }
+        equipos: equiposInfo,
+      },
     };
   }
 
@@ -173,26 +173,28 @@ class Contratacion {
          CREATE (contrato)-[:CONTRATO_CON]->(e)
          CREATE (d)-[:JUEGA_EN]->(e)
          RETURN d, contrato, e, id(contrato) AS contratoId`,
-        { 
-          deportistaID: neo4j.int(deportistaID), 
-          equipoID: neo4j.int(equipoID), 
-          fecha_inicio, 
-          fecha_fin, 
-          valor_contrato: neo4j.int(valor_contrato) 
+        {
+          deportistaID: neo4j.int(deportistaID),
+          equipoID: neo4j.int(equipoID),
+          fecha_inicio,
+          fecha_fin,
+          valor_contrato: neo4j.int(valor_contrato),
         }
       );
-  
+
       if (result.records.length === 0) {
-        throw new Error("No se devolvieron registros al crear la contratación.");
+        throw new Error(
+          "No se devolvieron registros al crear la contratación."
+        );
       }
-  
+
       const record = result.records[0];
-  
-      const contratoId = record.get('contratoId');
-      const contratoProps = record.get('contrato').properties;
-      const deportistaProps = record.get('d').properties;
-      const equipoProps = record.get('e').properties;
-  
+
+      const contratoId = record.get("contratoId");
+      const contratoProps = record.get("contrato").properties;
+      const deportistaProps = record.get("d").properties;
+      const equipoProps = record.get("e").properties;
+
       return {
         id: contratoId.toNumber(),
         deportista: {
@@ -205,7 +207,7 @@ class Contratacion {
           fecha_inicio: formatDate(contratoProps.fecha_inicio),
           fecha_fin: formatDate(contratoProps.fecha_fin),
           valor_contrato: contratoProps.valor_contrato.toNumber(),
-        }
+        },
       };
     } catch (error) {
       console.error("Error en Contratacion.create:", error);
@@ -216,31 +218,30 @@ class Contratacion {
   }
 
   // Actualizar una contratación
-  static async update(
-    deportistaID,
-    equipoID,
-    { fecha_inicio, fecha_fin, valor_contrato }
-  ) {
+  static async update(contratoID, setClause, parametros) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:TIENE_CONTRATO]->(c:Contrato)-[:CONTRATO_CON]->(e:Equipo)
-         WHERE id(d) = $deportistaID AND id(e) = $equipoID
-         SET c.fecha_inicio = date($fecha_inicio),
-             c.fecha_fin = date($fecha_fin),
-             c.valor_contrato = $valor_contrato
-         RETURN d, c, e`,
-        { deportistaID, equipoID, fecha_inicio, fecha_fin, valor_contrato }
+        `MATCH (c:Contrato)
+             WHERE id(c) = $contratoID
+             SET ${setClause}
+             RETURN c`,
+        { contratoID: neo4j.int(contratoID), ...parametros }
       );
-
+  
       const record = result.records[0];
-      return record
-        ? {
-            deportista: record.get("d").properties,
-            equipo: record.get("e").properties,
-            contrato: record.get("c").properties,
-          }
-        : null;
+      if (!record) return null;
+  
+      const properties = record.get("c").properties;
+  
+      return {
+        contrato: {
+          ...properties,
+          fecha_inicio: formatDate(properties.fecha_inicio),
+          fecha_fin: formatDate(properties.fecha_fin), 
+          valor_contrato: properties.valor_contrato.toNumber()
+        }
+      };
     } finally {
       await session.close();
     }

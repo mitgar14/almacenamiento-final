@@ -47,10 +47,8 @@ router.post('/', [
 // Actualizar un deportista
 router.put('/:id', [
     check('id', 'El ID es obligatorio').not().isEmpty(),
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('dorsal', 'El dorsal debe ser un número entero').optional().isInt(),
-    check('posicion', 'La posición es obligatoria').optional().not().isEmpty(),
-    check('sexo', 'El sexo debe ser MASCULINO, FEMENINO u OTRO').optional().isIn(['Masculino', 'Femenino', 'Otro']),
+    check('sexo', 'El sexo debe ser MASCULINO, FEMENINO u OTRO').optional().isIn(['MASCULINO', 'FEMENINO', 'OTRO']),
     check('id').custom(existeDeportistaPorID),
     validarCampos
 ], actualizarDeportista);

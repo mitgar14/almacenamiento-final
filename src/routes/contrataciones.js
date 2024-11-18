@@ -10,8 +10,8 @@ const {
 } = require('../controllers/contrataciones');
 const { validarCampos,
     existeDeportistaPorID,
-    existeEquipoPorID,
-    existeContratacionPorID
+    existeContratacionPorID,
+    existeEquipoPorID
  } = require('../middlewares');
 
 const router = Router();
@@ -46,21 +46,19 @@ router.post('/', [
 ], crearContratacion);
 
 // Actualizar una contratación
-router.put('/:deportistaID/:equipoID', [
-    check('deportistaID', 'ID de deportista inválido').isInt(),
-    check('equipoID', 'ID de equipo inválido').isInt(),
+router.put('/:contratoID', [
+    check('contratoID', 'ID de contratación es obligatorio').isInt(),
     check('fecha_inicio', 'Fecha de inicio es obligatoria').optional().isDate(),
     check('fecha_fin', 'Fecha de finalización es obligatoria').optional().isDate(),
     check('valor_contrato', 'El valor del contrato debe ser un número positivo').optional().isFloat({ gt: 0 }),
-    check('deportistaID').custom(existeDeportistaPorID),
-    check('equipoID').custom(existeEquipoPorID),
+    check('contratoID').custom(existeContratacionPorID),
     validarCampos
 ], actualizarContratacion);
 
 // Eliminar una contratación
-router.delete('/:contratacionID', [
-    check("contratacionID", "El ID de la contratación es obligatorio").not().isEmpty(),
-    check('contratacionID').custom(existeContratacionPorID),
+router.delete('/:contratoID', [
+    check("contratoID", "El ID de la contratación es obligatorio").not().isEmpty(),
+    check('contratoID').custom(existeContratacionPorID),
     validarCampos
 ], eliminarContratacion);
 

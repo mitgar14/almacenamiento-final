@@ -164,24 +164,28 @@ class Deportista {
     }
   }
 
-  // Actualizar un deportista
-  static async update(id, { nombre, dorsal, posicion, sexo }) {
+  // Actualizar un deportista con campos opcionales proporcionados desde el controlador
+  static async update(id, setClause, parametros) {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista {id: $id})
-                 SET d.nombre = $nombre, d.dorsal = $dorsal, d.posicion = $posicion, d.sexo = $sexo
-                 RETURN d`,
-        {
-          id,
-          nombre,
-          dorsal: neo4j.int(dorsal),
-          posicion,
-          sexo,
-        }
+        `MATCH (d:Deportista) 
+         WHERE id(d) = $id 
+         SET ${setClause} 
+         RETURN d`,
+        parametros
       );
+
       const record = result.records[0];
-      return record ? record.get("d").properties : null;
+      if (!record) return null;
+
+      const deportista = record.get("d").properties;
+
+      if (deportista.dorsal) {
+        deportista.dorsal = deportista.dorsal.toNumber();
+      }
+
+      return deportista;
     } finally {
       await session.close();
     }

@@ -25,7 +25,7 @@ const noExistenDeportistasPorEquipo = async (id) => {
     );
     const count = result.records[0].get('count').toNumber();
     if (count > 0) {
-      throw new Error(`No se puede eliminar el equipo con ID ${id} porque tiene deportistas asociados`);
+      throw new Error(`No se puede eliminar el equipo con ID ${id} porque tiene ${count} deportista(s) asociado(s)`);
     }
   } finally {
     await session.close();
@@ -41,7 +41,7 @@ const noExistenContratacionesPorEquipo = async (id) => {
     );
     const count = result.records[0].get('count').toNumber();
     if (count > 0) {
-      throw new Error(`No se puede eliminar el equipo con ID ${id} porque tiene contrataciones asociadas`);
+      throw new Error(`No se puede eliminar el equipo con ID ${id} porque tiene ${count} contratacion(es) asociada(s)`);
     }
   } finally {
     await session.close();

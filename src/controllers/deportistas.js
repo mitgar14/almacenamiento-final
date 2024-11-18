@@ -1,4 +1,6 @@
+const neo4j = require('neo4j-driver');
 const Deportista = require('../models/deportista');
+const standardizeString = require('../helpers/string');
 
 const obtenerDeportistas = async (req, res) => {
     try {
@@ -46,16 +48,49 @@ const crearDeportista = async (req, res) => {
 
 const actualizarDeportista = async (req, res) => {
     const { id } = req.params;
+    const campos = req.body;
+  
     try {
-        const deportistaActualizado = await Deportista.update(id, req.body);
-        if (!deportistaActualizado) {
-            return res.status(404).json({ error: 'Deportista no encontrado' });
-        }
-        res.status(200).json(deportistaActualizado);
+      // Verificar que se proporcionan campos para actualizar
+      if (Object.keys(campos).length === 0) {
+        return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
+      }
+  
+      // Construir la cláusula SET y los parámetros
+      const actualizaciones = [];
+      const parametros = { id: neo4j.int(id) };
+  
+      if (campos.nombre) {
+        actualizaciones.push('d.nombre = $nombre');
+        parametros.nombre = standardizeString(campos.nombre);
+      }
+      if (campos.dorsal !== undefined) {
+        actualizaciones.push('d.dorsal = $dorsal');
+        parametros.dorsal = neo4j.int(campos.dorsal);
+      }
+      if (campos.posicion) {
+        actualizaciones.push('d.posicion = $posicion');
+        parametros.posicion = standardizeString(campos.posicion);
+      }
+      if (campos.sexo) {
+        actualizaciones.push('d.sexo = $sexo');
+        parametros.sexo = standardizeString(campos.sexo);
+      }
+  
+      const setClause = actualizaciones.join(', ');
+  
+      // Llamar al modelo pasando la cláusula SET y los parámetros
+      const deportistaActualizado = await Deportista.update(id, setClause, parametros);
+  
+      if (!deportistaActualizado) {
+        return res.status(404).json({ error: 'Deportista no encontrado' });
+      }
+  
+      res.status(200).json(deportistaActualizado);
     } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar el deportista', detalle: error.message });
+      res.status(500).json({ error: 'Error al actualizar el deportista', detalle: error.message });
     }
-};
+  };
 
 const eliminarDeportista = async (req, res) => {
     const { id } = req.params;
