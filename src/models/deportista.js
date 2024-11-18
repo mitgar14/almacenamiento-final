@@ -162,7 +162,7 @@ class Deportista {
              })
              CREATE (d)-[:NACE_EN {fecha_nacimiento: date($fecha_nacimiento)}]->(c)
              CREATE (d)-[:ES_DE]->(p)
-             RETURN d`,
+             RETURN d, id(d) as deportistaId`,
         {
           nombre,
           dorsal: neo4j.int(dorsal),
@@ -179,6 +179,7 @@ class Deportista {
       }
 
       const deportista = result.records[0].get("d").properties;
+      deportista.id = result.records[0].get("deportistaId").toNumber();
       deportista.dorsal = deportista.dorsal.toNumber();
       return deportista;
     } catch (error) {
