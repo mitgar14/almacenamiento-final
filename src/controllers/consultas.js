@@ -1,5 +1,5 @@
-const neo4j = require('neo4j-driver');
-const Consultas = require('../models/consultas');
+const neo4j = require("neo4j-driver");
+const Consultas = require("../models/consultas");
 
 const realizarConsulta = require("../helpers/consultas");
 
@@ -12,7 +12,7 @@ const consultarDeportistasConContratosDesde = (req, res) => {
 
     if (resultado.length === 0) {
       return res.status(404).json({
-        mensaje: "No se encontraron contratos desde la fecha especificada"
+        mensaje: "No se encontraron contratos desde la fecha especificada",
       });
     }
 
@@ -21,42 +21,46 @@ const consultarDeportistasConContratosDesde = (req, res) => {
 };
 
 const consultarDeportistasMasculinosEnFutbolEspana = (req, res) =>
-    realizarConsulta(req, res, Consultas.deportistasMasculinosEnEquiposFutbolEspana);
+  realizarConsulta(
+    req,
+    res,
+    Consultas.deportistasMasculinosEnEquiposFutbolEspana
+  );
 
 const consultarDeportistasDeEspanaEnEquiposEspana = (req, res) =>
-    realizarConsulta(req, res, Consultas.deportistasDeEspanaEnEquiposEspana);
+  realizarConsulta(req, res, Consultas.deportistasDeEspanaEnEquiposEspana);
 
 const consultarDeportistasConContratosAltos = (req, res) =>
-    realizarConsulta(req, res, Consultas.deportistasConContratosAltos);
+  realizarConsulta(req, res, Consultas.deportistasConContratosAltos);
 
 const consultarCantidadDeportistasPorEquipo = (req, res) =>
-    realizarConsulta(req, res, Consultas.cantidadDeportistasPorEquipo);
+  realizarConsulta(req, res, Consultas.cantidadDeportistasPorEquipo);
 
 // Consultas adicionales
 const consultarNacionalidadDeportistasPorEquipo = (req, res) =>
   realizarConsulta(req, res, Consultas.nacionalidadDeportistasPorEquipo);
 
 const consultarCantidadDeportistasPorDeporteMinimo1 = (req, res) =>
-    realizarConsulta(req, res, Consultas.cantidadDeportistasPorDeporteMinimo1);
+  realizarConsulta(req, res, Consultas.cantidadDeportistasPorDeporteMinimo1);
 
 const consultarContratosTerminandoEn6Meses = (req, res) =>
-    realizarConsulta(req, res, Consultas.contratosTerminandoEn6Meses);
+  realizarConsulta(req, res, Consultas.contratosTerminandoEn6Meses);
 
 const consultarEquiposConContratosActivos = (req, res) =>
-    realizarConsulta(req, res, Consultas.equiposConContratosActivos);
+  realizarConsulta(req, res, Consultas.equiposConContratosActivos);
 
 const consultarDeportistasConContratosLargos = (req, res) =>
-    realizarConsulta(req, res, Consultas.deportistasConContratosLargos);
+  realizarConsulta(req, res, Consultas.deportistasConContratosLargos);
 
 module.exports = {
-    consultarDeportistasConContratosDesde,
-    consultarDeportistasMasculinosEnFutbolEspana,
-    consultarDeportistasDeEspanaEnEquiposEspana,
-    consultarDeportistasConContratosAltos,
-    consultarCantidadDeportistasPorEquipo,
-    consultarNacionalidadDeportistasPorEquipo,
-    consultarCantidadDeportistasPorDeporteMinimo1,
-    consultarContratosTerminandoEn6Meses,
-    consultarEquiposConContratosActivos,
-    consultarDeportistasConContratosLargos
+  consultarDeportistasConContratosDesde,
+  consultarDeportistasMasculinosEnFutbolEspana,
+  consultarDeportistasDeEspanaEnEquiposEspana,
+  consultarDeportistasConContratosAltos,
+  consultarCantidadDeportistasPorEquipo,
+  consultarNacionalidadDeportistasPorEquipo,
+  consultarCantidadDeportistasPorDeporteMinimo1,
+  consultarContratosTerminandoEn6Meses,
+  consultarEquiposConContratosActivos,
+  consultarDeportistasConContratosLargos,
 };

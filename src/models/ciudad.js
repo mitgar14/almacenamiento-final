@@ -1,5 +1,5 @@
-const neo4j = require('neo4j-driver');
-const driver = require('../database/Neo4jConnection').driver;
+const neo4j = require("neo4j-driver");
+const driver = require("../database/Neo4jConnection").driver;
 
 const standardizeString = require("../helpers/string");
 class Ciudad {
@@ -30,9 +30,9 @@ class Ciudad {
         `MATCH (p:Pais) WHERE id(p) = $paisID
          CREATE (c:Ciudad {nombre: $nombre})-[:PERTENECE_A]->(p)
          RETURN c, id(c) AS ciudadId, p.nombre AS pais`,
-        { 
-          nombre, 
-          paisID: neo4j.int(paisID) 
+        {
+          nombre,
+          paisID: neo4j.int(paisID),
         }
       );
 
@@ -44,9 +44,9 @@ class Ciudad {
 
       const record = result.records[0];
 
-      const createdId = record.get('ciudadId');
-      const createdCiudad = record.get('c').properties;
-      const paisName = record.get('pais');
+      const createdId = record.get("ciudadId");
+      const createdCiudad = record.get("c").properties;
+      const paisName = record.get("pais");
 
       if (!createdId) {
         throw new Error("No se pudo obtener el ID de la ciudad creada.");
@@ -55,7 +55,7 @@ class Ciudad {
       return {
         id: createdId.toNumber(),
         ...createdCiudad,
-        pais: paisName
+        pais: paisName,
       };
     } finally {
       await session.close();
@@ -77,9 +77,9 @@ class Ciudad {
 
       const record = result.records[0];
       return {
-        id: record.get('id').toNumber(),
-        ...record.get('c').properties,
-        pais: record.get('pais')
+        id: record.get("id").toNumber(),
+        ...record.get("c").properties,
+        pais: record.get("pais"),
       };
     } finally {
       await session.close();
@@ -101,9 +101,9 @@ class Ciudad {
 
       const record = result.records[0];
       return {
-        id: record.get('id').toNumber(),
-        ...record.get('c').properties,
-        pais: record.get('pais')
+        id: record.get("id").toNumber(),
+        ...record.get("c").properties,
+        pais: record.get("pais"),
       };
     } finally {
       await session.close();
@@ -124,9 +124,9 @@ class Ciudad {
 
       const record = result.records[0];
       return {
-        id: record.get('id').toNumber(),
-        ...record.get('c').properties,
-        pais: record.get('pais')
+        id: record.get("id").toNumber(),
+        ...record.get("c").properties,
+        pais: record.get("pais"),
       };
     } finally {
       await session.close();

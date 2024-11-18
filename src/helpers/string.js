@@ -6,6 +6,6 @@ function standardizeString(str) {
     .replace(/[^\w\s]/gi, "")
     .toUpperCase()
     .trim();
-};
+}
 
 module.exports = standardizeString;

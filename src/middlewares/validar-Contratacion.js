@@ -1,11 +1,11 @@
-const { driver } = require('../database/Neo4jConnection');
-const neo4j = require('neo4j-driver');
+const { driver } = require("../database/Neo4jConnection");
+const neo4j = require("neo4j-driver");
 
 const existeContratacionPorID = async (id) => {
   const session = driver.session();
   try {
     const result = await session.run(
-      'MATCH (c:Contrato) WHERE id(c) = $id RETURN c',
+      "MATCH (c:Contrato) WHERE id(c) = $id RETURN c",
       { id: neo4j.int(id) }
     );
     if (!result.records.length) {
@@ -27,7 +27,9 @@ const existenContratacionesPorDeportista = async (deportistaID) => {
       { deportistaID: neo4j.int(deportistaID) }
     );
     if (!result.records.length) {
-      throw new Error(`No existen contrataciones para el deportista con ID ${deportistaID}`);
+      throw new Error(
+        `No existen contrataciones para el deportista con ID ${deportistaID}`
+      );
     }
   } finally {
     await session.close();
@@ -45,7 +47,9 @@ const existenContratacionesPorEquipo = async (equipoID) => {
       { equipoID: neo4j.int(equipoID) }
     );
     if (!result.records.length) {
-      throw new Error(`No existen contrataciones para el equipo con ID ${equipoID}`);
+      throw new Error(
+        `No existen contrataciones para el equipo con ID ${equipoID}`
+      );
     }
   } finally {
     await session.close();
@@ -55,5 +59,5 @@ const existenContratacionesPorEquipo = async (equipoID) => {
 module.exports = {
   existeContratacionPorID,
   existenContratacionesPorDeportista,
-  existenContratacionesPorEquipo
+  existenContratacionesPorEquipo,
 };

@@ -1,7 +1,7 @@
-const neo4j = require('neo4j-driver');
-const driver = require('../database/Neo4jConnection').driver;
+const neo4j = require("neo4j-driver");
+const driver = require("../database/Neo4jConnection").driver;
 
-const standardizeString = require('../helpers/string');
+const standardizeString = require("../helpers/string");
 
 class Pais {
   // Obtener o crear un país (para Deportistas)
@@ -38,8 +38,8 @@ class Pais {
 
       const record = result.records[0];
 
-      const createdId = record.get('paisId');
-      const createdPais = record.get('p').properties;
+      const createdId = record.get("paisId");
+      const createdPais = record.get("p").properties;
 
       if (!createdId) {
         throw new Error("No se pudo obtener el ID del país creado.");
@@ -47,7 +47,7 @@ class Pais {
 
       return {
         id: createdId.toNumber(),
-        ...createdPais
+        ...createdPais,
       };
     } finally {
       await session.close();
@@ -69,8 +69,8 @@ class Pais {
 
       const record = result.records[0];
       return {
-        id: record.get('id').toNumber(),
-        ...record.get('p').properties
+        id: record.get("id").toNumber(),
+        ...record.get("p").properties,
       };
     } finally {
       await session.close();
@@ -91,8 +91,8 @@ class Pais {
 
       const record = result.records[0];
       return {
-        id: record.get('id').toNumber(),
-        ...record.get('p').properties
+        id: record.get("id").toNumber(),
+        ...record.get("p").properties,
       };
     } finally {
       await session.close();

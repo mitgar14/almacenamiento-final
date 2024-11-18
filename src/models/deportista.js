@@ -89,16 +89,16 @@ class Deportista {
          RETURN d`,
         { idEquipo: neo4j.int(idEquipo) }
       );
-  
-      return result.records.map(record => {
-        const deportista = record.get('d').properties;
-        deportista.id = record.get('d').identity.toNumber();
+
+      return result.records.map((record) => {
+        const deportista = record.get("d").properties;
+        deportista.id = record.get("d").identity.toNumber();
         deportista.dorsal = deportista.dorsal.toNumber();
         return deportista;
       });
     } catch (error) {
-      console.error('Error en Deportista.getByEquipo:', error);
-      throw new Error('Error al obtener los deportistas del equipo');
+      console.error("Error en Deportista.getByEquipo:", error);
+      throw new Error("Error al obtener los deportistas del equipo");
     } finally {
       await session.close();
     }

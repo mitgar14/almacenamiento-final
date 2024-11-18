@@ -29,9 +29,7 @@ const obtenerContratacionPorDeportista = async (req, res) => {
 const obtenerContratacionPorEquipo = async (req, res) => {
   const { equipoID } = req.params;
   try {
-    const contratacion = await Contratacion.getByEquipo(
-      equipoID
-    );
+    const contratacion = await Contratacion.getByEquipo(equipoID);
 
     res.status(200).json(contratacion);
   } catch (error) {

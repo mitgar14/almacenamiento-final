@@ -320,15 +320,15 @@ class Consultas {
          WHERE duration.between(date(c.fecha_inicio), date(c.fecha_fin)).years >= 3
          RETURN d, c, e, p.nombre AS pais`
       );
-  
+
       return result.records.map((record) => {
         const fechaFin = new Date(record.get("c").properties.fecha_fin);
         const today = new Date();
-  
+
         let years = fechaFin.getFullYear() - today.getFullYear();
         let months = fechaFin.getMonth() - today.getMonth();
         let days = fechaFin.getDate() - today.getDate();
-  
+
         if (days < 0) {
           months -= 1;
           const lastDayOfPreviousMonth = new Date(
@@ -342,15 +342,17 @@ class Consultas {
           years -= 1;
           months += 12;
         }
-  
+
         let leFaltan;
-  
+
         if (years < 0 || months < 0 || days < 0) {
           leFaltan = "Contrato terminado";
         } else {
-          leFaltan = `${years} año${years !== 1 ? "s" : ""}, ${months} mes${months !== 1 ? "es" : ""}, ${days} día${days !== 1 ? "s" : ""}`;
+          leFaltan = `${years} año${years !== 1 ? "s" : ""}, ${months} mes${
+            months !== 1 ? "es" : ""
+          }, ${days} día${days !== 1 ? "s" : ""}`;
         }
-  
+
         return {
           deportista: {
             ...record.get("d").properties,
