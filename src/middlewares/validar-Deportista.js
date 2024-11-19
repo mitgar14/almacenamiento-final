@@ -46,6 +46,27 @@ const existeFechaApropiada = (fecha) => {
   return true;
 };
 
+const existeDorsalEnEquipo = async (dorsal, equipoID) => {
+  const session = driver.session();
+  try {
+    const result = await session.run(
+      `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)
+       WHERE id(e) = $equipoID AND d.dorsal = $dorsal
+       RETURN d`,
+      { 
+        equipoID: neo4j.int(equipoID),
+        dorsal: neo4j.int(dorsal)
+      }
+    );
+    
+    if (result.records.length > 0) {
+      throw new Error(`El dorsal ${dorsal} ya está en uso en este equipo`);
+    }
+  } finally {
+    await session.close();
+  }
+};
+
 const noExistenContratacionesPorDeportista = async (id) => {
   const session = driver.session();
   try {
@@ -67,5 +88,6 @@ const noExistenContratacionesPorDeportista = async (id) => {
 module.exports = {
   existeDeportistaPorID,
   existeFechaApropiada,
+  existeDorsalEnEquipo,
   noExistenContratacionesPorDeportista,
 };

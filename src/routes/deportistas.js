@@ -6,6 +6,7 @@ const {
   existeEquipoPorID,
   noExistenContratacionesPorDeportista,
   existeFechaApropiada,
+  existeDorsalEnEquipo
 } = require("../middlewares");
 
 const {
@@ -69,6 +70,7 @@ router.post(
       .isEmpty(),
     check("pais", "El nombre o el ID del país es obligatorio").not().isEmpty(),
     check("fecha_nacimiento").custom(existeFechaApropiada),
+    check("dorsal").custom(existeDorsalEnEquipo),
     validarCampos,
   ],
   crearDeportista
