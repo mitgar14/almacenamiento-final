@@ -7,6 +7,174 @@
 	},
 	"item": [
 		{
+			"name": "Equipos",
+			"item": [
+				{
+					"name": "getEquipos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/equipos/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getEquiposPais",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/equipos/pais?pais=españa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								"pais"
+							],
+							"query": [
+								{
+									"key": "pais",
+									"value": "españa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getEquiposDeporte",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/equipos/deporte?deporte=beisbol",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								"deporte"
+							],
+							"query": [
+								{
+									"key": "deporte",
+									"value": "beisbol"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getEquipoID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/equipos/278",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								"278"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postEquipo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Inter Miami CF\",\r\n    \"pais\": \"Estados Unidos\",\r\n    \"deporte\": \"futbol\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipos/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "putEquipo",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Inter Miami CF\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipos/304",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								"304"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteEquipo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/equipos/302",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipos",
+								"302"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Deportistas",
 			"item": [
 				{
@@ -15,16 +183,34 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getDeportistasEquipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/deportistas/equipo/278",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deportistas",
+								"equipo",
+								"278"
 							]
 						}
 					},
@@ -36,12 +222,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/buscar?nombre=ssi",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/buscar?nombre=mes",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
@@ -50,7 +234,7 @@
 							"query": [
 								{
 									"key": "nombre",
-									"value": "ssi"
+									"value": "mes"
 								}
 							]
 						}
@@ -75,16 +259,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/281",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/301",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
-								"281"
+								"301"
 							]
 						}
 					},
@@ -105,12 +287,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
@@ -135,16 +315,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/297",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/306",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
-								"297"
+								"306"
 							]
 						}
 					},
@@ -156,123 +334,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/deportistas/297",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/deportistas/305",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"deportistas",
-								"297"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Equipos",
-			"item": [
-				{
-					"name": "getEquipos",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/equipos/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"equipos",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "postEquipo",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"nombre\": \"Inter Miami CF\",\r\n    \"pais\": \"Estados Unidos\",\r\n    \"deporte\": \"futbol\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/equipos/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"equipos",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "putEquipo",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"nombre\": \"Inter Miami Cf\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/equipos/299",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"equipos",
-								"299"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "deleteEquipo",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/equipos/299",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"equipos",
-								"299"
+								"305"
 							]
 						}
 					},
@@ -289,16 +358,54 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/contrataciones/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/contrataciones/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"contrataciones",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getContratacionesDeportista",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contrataciones/deportista/281",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contrataciones",
+								"deportista",
+								"281"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getContratacionesDeportistaEquipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contrataciones/equipo/278",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contrataciones",
+								"equipo",
+								"278"
 							]
 						}
 					},
@@ -311,7 +418,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"deportistaID\": 297,\r\n    \"equipoID\": 299,\r\n    \"fecha_inicio\": \"2023-07-15\",\r\n    \"fecha_fin\": \"2025-12-31\",\r\n    \"valor_contrato\": 25000000\r\n}",
+							"raw": "{\r\n    \"deportistaID\": 306,\r\n    \"equipoID\": 304,\r\n    \"fecha_inicio\": \"2023-07-15\",\r\n    \"fecha_fin\": \"2025-12-31\",\r\n    \"valor_contrato\": 25000000\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -319,12 +426,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/contrataciones/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/contrataciones/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"contrataciones",
@@ -341,7 +446,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"fecha_inicio\": \"2023-01-15\"\r\n}",
+							"raw": "{\r\n    \"fecha_inicio\": \"2023-01-19\",\r\n    \"fecha_fin\": \"2025-03-31\",\r\n    \"valor_contrato\": 25000000\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -349,16 +454,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/contrataciones/300",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/contrataciones/307",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"contrataciones",
-								"300"
+								"307"
 							]
 						}
 					},
@@ -370,16 +473,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/contrataciones/300",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/contrataciones/303",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"contrataciones",
-								"300"
+								"303"
 							]
 						}
 					},
@@ -396,12 +497,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/contratos-desde?fecha=2014-01-01",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/contratos-desde?fecha=2020-01-01",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -410,7 +509,7 @@
 							"query": [
 								{
 									"key": "fecha",
-									"value": "2014-01-01"
+									"value": "2020-01-01"
 								}
 							]
 						}
@@ -423,12 +522,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/masculinos-futbol-espana",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/masculinos-futbol-espana",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -444,12 +541,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/deportistas-espana-equipos-espana",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/deportistas-espana-equipos-espana",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -465,12 +560,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/contratos-altos",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/contratos-altos",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -486,12 +579,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/deportistas-por-equipo",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/deportistas-por-equipo",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -507,21 +598,19 @@
 			"name": "Consultas - Grupo",
 			"item": [
 				{
-					"name": "Equipos con más de 3 deportistas",
+					"name": "Nacionalidad de los deportistas en determinado equipo",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/equipos-mas-3-deportistas",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/nacionalidad-deportistas-por-equipo",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
-								"equipos-mas-3-deportistas"
+								"nacionalidad-deportistas-por-equipo"
 							]
 						}
 					},
@@ -533,12 +622,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/deportistas-por-deporte-minimo-1",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/deportistas-por-deporte-minimo-1",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -554,12 +641,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/contratos-terminan-en-6-meses",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/contratos-terminan-en-6-meses",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -575,12 +660,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/equipos-contratos-activos",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/equipos-contratos-activos",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -596,12 +679,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/consultas/deportistas-contratos-largos",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/consultas/deportistas-contratos-largos",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"consultas",
@@ -612,6 +693,35 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"value": "",
+			"type": "string",
+			"disabled": true
 		}
 	]
 }
