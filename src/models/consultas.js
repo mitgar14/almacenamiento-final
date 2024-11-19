@@ -151,19 +151,19 @@ class Consultas {
     }
   }
 
-  // Consulta adicional 1: Nacionalidad de los deportistas en cada equipo
+  // Consulta adicional 1: Nacionalidad de deportistas por equipo
   static async nacionalidadDeportistasPorEquipo() {
     const session = driver.session();
     try {
       const result = await session.run(
-        `MATCH (d:Deportista)-[:JUEGA_EN]->(e:Equipo)
-         MATCH (e)-[:ES_DE]->(p:Pais)
+        `MATCH (d:Deportista)-[:ES_DE]->(p:Pais)
+         MATCH (d)-[:JUEGA_EN]->(e:Equipo)-[:ES_DE]->(pe:Pais)
          MATCH (e)-[:PRACTICA]->(dep:Deporte)
          RETURN p.nombre AS nacionalidad, count(d) AS cantidad, collect({
             nombre: d.nombre,
             equipo: e.nombre,
             deporte: dep.nombre,
-            pais: p.nombre
+            pais: pe.nombre
          }) AS jugadores
          ORDER BY p.nombre`
       );
